@@ -9,7 +9,7 @@ namespace voting_system_core.Models
         public string OptionText { get; set; }
 
         // Foreign Key
-        public int PollID { get; set; }
+        public int PollId { get; set; }
         public Poll Poll { get; set; }
 
         // Navigation Property

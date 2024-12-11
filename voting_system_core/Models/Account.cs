@@ -7,7 +7,7 @@ namespace voting_system_core.Models
     [Table("account")]
     public class Account
     {
-        public string AccountID { get; set; }
+        public string AccountId { get; set; }
         public string UserName { get; set; }
         public string PasswordHash { get; set; }
         public string Salt { get; set; }

@@ -1,11 +1,14 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace voting_system_core.Models
 {
     public class RefreshToken
     {
         public int TokenId { get; set; }
         public string Token { get; set; }
+        [ForeignKey("AccountId")]
         public int AccountId { get; set; }
         public Account Account { get; set; }
         public DateTime ExpiryDate { get; set; }
