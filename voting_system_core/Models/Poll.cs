@@ -5,7 +5,7 @@ namespace voting_system_core.Models
     [Table("poll")]
     public class Poll
     {
-        public int PollID { get; set; } // Use int for IDs
+        public int PollId { get; set; } // Use int for IDs
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime StartTime { get; set; }
