@@ -16,6 +16,21 @@ namespace voting_system_core.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Poll>()
+                .HasMany(p => p.Options)
+                .WithOne(p => p.Poll)
+                .HasForeignKey(o => o.PollId);
+
+            modelBuilder.Entity<Poll>()
+                .HasMany(p => p.Votes)
+                .WithOne(v => v.Poll)
+                .HasForeignKey(v => v.PollId);
+
+            modelBuilder.Entity<Option>()
+                .HasMany(o => o.Votes)
+                .WithOne(v => v.Option)
+                .HasForeignKey(v => v.OptionId);
         }
     }
 }

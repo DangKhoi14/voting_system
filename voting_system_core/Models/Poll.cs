@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace voting_system_core.Models
 {
     [Table("poll")]
     public class Poll
     {
-        public int PollId { get; set; } // Use int for IDs
+        public Ulid PollId { get; set; }
+        public string CreateBy { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime StartTime { get; set; }
