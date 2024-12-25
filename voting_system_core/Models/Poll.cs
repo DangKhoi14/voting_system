@@ -7,7 +7,8 @@ namespace voting_system_core.Models
     public class Poll
     {
         public Ulid PollId { get; set; }
-        public string CreateBy { get; set; }
+        // Foreign key
+        public string Username { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime StartTime { get; set; }

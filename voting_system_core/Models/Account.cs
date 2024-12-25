@@ -23,7 +23,7 @@ namespace voting_system_core.Models
 
         // Additional attributes
         public sbyte Role { get; set; }
-        public DateTime? LastLogin { get; set; }
+        public DateTime LastLogin { get; set; }
         public bool IsActive { get; set; } = true;
         public string ProfilePictureUrl { get; set; }
         public string ResetPasswordToken { get; set; }
