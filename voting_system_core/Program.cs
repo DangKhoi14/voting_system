@@ -1,6 +1,8 @@
+using voting_system_core.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using voting_system_core.Data;
+using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +13,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddDbContext<VotingDbContext>(options
-//    => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<Supabase.Client>(_ =>
+    new Supabase.Client(
+        builder.Configuration["SupabaseUrl"],
+        builder.Configuration["SupabaseKey"],
+        new SupabaseOptions
+        {
+            AutoRefreshToken = true,
+            AutoConnectRealtime = true,
+        }));
+
+builder.Services.AddDbContext<VotingDbContext>(options
+    => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

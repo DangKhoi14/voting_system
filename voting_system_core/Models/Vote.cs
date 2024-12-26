@@ -5,7 +5,7 @@ namespace voting_system_core.Models
     [Table("vote")]
     public class Vote
     {
-        public ushort VoteId { get; set; } 
+        public Ulid VoteId { get; set; } 
         public string Email { get; set; }
         public bool IsVerified { get; set; }
 
@@ -14,7 +14,7 @@ namespace voting_system_core.Models
         public Poll Poll { get; set; }
 
         // Option chosen by the voter
-        public int OptionId { get; set; }
+        public Ulid OptionId { get; set; }
         public Option Option { get; set; }
     }
 }

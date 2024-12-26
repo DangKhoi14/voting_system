@@ -5,10 +5,9 @@ namespace voting_system_core.Models
     [Table("option")]
     public class Option
     {
-        public int OptionID { get; set; } // Use int for IDs
+        public Ulid OptionID { get; set; }
         public string OptionText { get; set; }
 
-        // Foreign Key
         public int PollId { get; set; }
         public Poll Poll { get; set; }
 

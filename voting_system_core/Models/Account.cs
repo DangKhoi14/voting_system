@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+//using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace voting_system_core.Models
 {
@@ -11,12 +14,14 @@ namespace voting_system_core.Models
     }
 
     [Table("account")]
-    public class Account
+    public class Account : BaseModel
     {
         //public string AccountId { get; set; }
+        
         public string Username { get; set; }
-        public string PasswordHash { get; set; }
-        public string Salt { get; set; }
+        public string Password { get; set; }
+        //public string PasswordHash { get; set; }
+        //public string Salt { get; set; }
         public string Email { get; set; }
         public DateOnly CreateAt { get; set; }
         public bool IsEmailVerified { get; set; }
@@ -24,7 +29,7 @@ namespace voting_system_core.Models
         // Additional attributes
         public sbyte Role { get; set; }
         public DateTime LastLogin { get; set; }
-        public bool IsActive { get; set; } = true;
+        //public bool IsActive { get; set; } = true;
         public string ProfilePictureUrl { get; set; }
         public string ResetPasswordToken { get; set; }
     }
