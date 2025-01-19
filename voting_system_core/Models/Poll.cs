@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace voting_system_core.Models
@@ -6,8 +7,11 @@ namespace voting_system_core.Models
     [Table("poll")]
     public class Poll
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Ulid PollId { get; set; }
-        // Foreign key
+
+        [ForeignKey("Username")]
         public string Username { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }

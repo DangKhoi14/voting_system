@@ -1,19 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace voting_system_core.Models
 {
     [Table("vote")]
     public class Vote
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Ulid VoteId { get; set; } 
         public string Email { get; set; }
         public bool IsVerified { get; set; }
 
-        // Foreign Key
+        [ForeignKey("PollId")]
         public Ulid PollId { get; set; }
         public Poll Poll { get; set; }
 
-        // Option chosen by the voter
+        [ForeignKey("OprionId")]
         public Ulid OptionId { get; set; }
         public Option Option { get; set; }
     }

@@ -1,8 +1,10 @@
 using voting_system_core.Service.Interface;
+using voting_system_core.Service.Impls;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using voting_system_core.Data;
-using Supabase;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,21 +14,35 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin",
+        builder => builder.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
 
-builder.Services.AddScoped<Supabase.Client>(_ =>
-    new Supabase.Client(
-        builder.Configuration["SupabaseUrl"],
-        builder.Configuration["SupabaseKey"],
-        new SupabaseOptions
-        {
-            AutoRefreshToken = true,
-            AutoConnectRealtime = true,
-        }));
+// Services
+//builder.Services.AddScoped<IPollService, PollService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddHttpContextAccessor();
+
+//var secretKey = builder.Configuration["AppSettings:SecretKey"];
+//var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
+
+// Logging configuration
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); // Log to console
+builder.Logging.AddDebug(); // Log to debug output
 
 builder.Services.AddDbContext<VotingDbContext>(options
-    => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 
 var app = builder.Build();
+app.UseCors("AllowOrigin");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -34,6 +50,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Logging middleware
+app.Use(async (context, next) =>
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        logger.LogInformation("Handling request: {Method} {Path}", context.Request.Method, context.Request.Path);
+        await next.Invoke();
+        logger.LogInformation("Finished handling request: {StatusCode}", context.Response.StatusCode);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An exception occurred while processing the request: {Method} {Path}", context.Request.Method, context.Request.Path);
+        throw;
+    }
+});
 
 app.UseHttpsRedirection();
 
