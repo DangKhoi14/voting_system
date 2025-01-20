@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using voting_system_core.Data;
+using voting_system_core.DTOs.Requests.Account;
 using voting_system_core.DTOs.Responses;
+using voting_system_core.DTOs.Responses.Account;
 using voting_system_core.DTOs.Responses.Accounts;
 using voting_system_core.Service.Interface;
 
@@ -44,6 +46,35 @@ namespace voting_system_core.Service.Impls
                     StatusCode = 500,
                     Message = ex.Message,
                 };
+            }
+        }
+
+        public async Task<APIResponse<LoginRes>> Login(LoginReq loginReq) 
+        {
+            try
+            {
+                var user = _context.Accounts.FirstOrDefault(x => x.Username == loginReq.UserName);
+                if (user == null)
+                {
+                    return new APIResponse<LoginRes>
+                    {
+                        StatusCode = 200,
+                        Message = $"User {loginReq.UserName} does not exist",
+                    };
+                }
+
+                bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginReq.Password, user.Password);
+                
+                if (!isValidPassword)
+                {
+                    return new APIResponse<LoginRes>
+                    {
+                        StatusCode = 401,
+                        Message = "Password is wrong",
+                    };
+                }
+
+                //var token = await TokenMana
             }
         }
     }

@@ -17,7 +17,7 @@ namespace voting_system_core.Models
         //public string PasswordHash { get; set; }
         //public string Salt { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         public DateOnly CreateAt { get; set; }
 
@@ -30,8 +30,8 @@ namespace voting_system_core.Models
 
         //public bool IsActive { get; set; } = true;
 
-        public string ProfilePictureUrl { get; set; }
+        public string? ProfilePictureUrl { get; set; }
 
-        public string ResetPasswordToken { get; set; }
+        public string? ResetPasswordToken { get; set; }
     }
 }
