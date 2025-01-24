@@ -18,7 +18,7 @@ namespace voting_system_core.Helper
             var secretKey = configuration.GetValue<string>("AppSettings:SecretKey");
             var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
             var options = new DbContextOptionsBuilder<VotingDbContext>()
-                .UseNpgsql(configuration.GetValue<string>("ConnectionString:Default"))
+                .UseNpgsql(configuration.GetValue<string>("ConnectionString:DefaultConnection"))
                 .Options;
 
             VotingDbContext context = new VotingDbContext(options);
@@ -44,7 +44,23 @@ namespace voting_system_core.Helper
             var refreshTokenEntity = new RefreshToken
             {
                 TokenId = Guid.NewGuid(),
-                
+                JwtId = token.Id,
+                Token = refreshToken,
+                Username = user.Username,
+                CreatedAt = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddHours(1),
+                IsRevoked = false,
+                IsUsed = false
+            };
+
+            context.RefreshTokens.Add(refreshTokenEntity);
+
+            await context.SaveChangesAsync();
+
+            return new LoginRes
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
         }
 
@@ -57,6 +73,5 @@ namespace voting_system_core.Helper
                 return Convert.ToBase64String(random);
             }
         }
-
     }
 }

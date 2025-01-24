@@ -21,5 +21,19 @@ namespace voting_system_core.Controllers
             var res = await _accountService.GetAll();
             return Ok(res);
         }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Login(LoginReq loginReq)
+        {
+            var res = await _accountService.Login(loginReq);
+            return Ok(res);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Create(CreateAccountReq req)
+        {
+            var res = await _accountService.Create(req);
+            return Ok(res);
+        }
     }
 }

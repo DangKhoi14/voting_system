@@ -20,5 +20,6 @@ namespace voting_system_core.Models
         public DateTime CreatedAt { get; set; }
         public DateTime ExpiryDate { get; set; }
         public bool IsRevoked { get; set; }
+        public bool IsUsed { get; set; }
     }
 }
