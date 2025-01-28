@@ -26,17 +26,13 @@ namespace voting_system_core.Service.Impls
         {
             try
             {
-                var accounts = _context.Accounts.ToList();
-                List<GetAccountRes> res = new List<GetAccountRes>();
-
-                foreach (var account in accounts)
-                {
-                    GetAccountRes item = new GetAccountRes();
-                    item.Username = account.Username;
-                    item.Email = account.Email;
-
-                    res.Add(item);
-                }
+                var res = await _context.Accounts
+                    .Select(account => new GetAccountRes
+                    {
+                        Username = account.Username,
+                        Email = account.Email
+                    })
+                    .ToListAsync();
 
                 return new APIResponse<List<GetAccountRes>>
                 {
@@ -47,10 +43,10 @@ namespace voting_system_core.Service.Impls
             }
             catch (Exception ex)
             {
-                return new APIResponse<List<GetAccountRes>>()
+                return new APIResponse<List<GetAccountRes>>
                 {
                     StatusCode = 500,
-                    Message = ex.Message,
+                    Message = ex.Message
                 };
             }
         }

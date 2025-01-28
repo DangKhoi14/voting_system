@@ -14,10 +14,12 @@ namespace voting_system_core.Models
 
         [ForeignKey("PollId")]
         public Ulid PollId { get; set; }
+        [NotMapped]
         public Poll Poll { get; set; }
 
         [ForeignKey("OprionId")]
         public Ulid OptionId { get; set; }
+        [NotMapped]
         public Option Option { get; set; }
     }
 }

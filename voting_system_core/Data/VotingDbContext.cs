@@ -24,7 +24,8 @@ namespace voting_system_core.Data
 
             var ulidConverter = new ValueConverter<Ulid, string>(
                 ulid => ulid.ToString(),
-                str => Ulid.Parse(str));
+                str => Ulid.Parse(str)
+            );
 
             modelBuilder.Entity<Account>(entity =>
             {
@@ -52,11 +53,12 @@ namespace voting_system_core.Data
             });
 
 
+
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.Property(e => e.Key).HasColumnType("int2");
-                entity.Property(e => e.Value).HasColumnType("varchar");
-                entity.Property(e => e.Authority).HasColumnType("text");
+                entity.Property(e => e.Key);
+                entity.Property(e => e.Value);
+                entity.Property(e => e.Authority);
             });
 
             modelBuilder.Entity<Poll>()
