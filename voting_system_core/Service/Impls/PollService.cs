@@ -25,13 +25,12 @@ namespace voting_system_core.Service.Impls
             var res = polls.Select(poll => new GetPollRes
             {
                 PollId = poll.PollId,
-                Username = poll.Username,
+                UserId = poll.UserId,
                 Title = poll.Title,
                 Description = poll.Description,
                 StartTime = poll.StartTime,
                 EndTime = poll.EndTime,
 
-                
             }).ToList();
 
             return new APIResponse<List<GetPollRes>>

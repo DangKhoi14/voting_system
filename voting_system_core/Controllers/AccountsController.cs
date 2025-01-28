@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using voting_system_core.Service.Interface;
 using voting_system_core.DTOs.Requests.Account;
+using Microsoft.Identity.Client;
 
 namespace voting_system_core.Controllers
 {
@@ -22,6 +23,13 @@ namespace voting_system_core.Controllers
             return Ok(res);
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetInfo(string UsernameOrEmail)
+        {
+            var res = await _accountService.GetAccountInfo(UsernameOrEmail);
+            return Ok(res);
+        }
+
         [HttpPost("[action]")]
         public async Task<ActionResult> Login(LoginReq loginReq)
         {
@@ -30,7 +38,7 @@ namespace voting_system_core.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Create(CreateAccountReq req)
+        public async Task<ActionResult> Create(CreateReq req)
         {
             var res = await _accountService.Create(req);
             return Ok(res);

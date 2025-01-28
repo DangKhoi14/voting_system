@@ -55,7 +55,53 @@ namespace voting_system_core.Service.Impls
             }
         }
 
-        public async Task<APIResponse<string>> Create(CreateAccountReq req)
+        public async Task<APIResponse<GetAccountInfoRes>> GetAccountInfo(string UsernameOrEmail)
+        {
+            try
+            {
+                var account = _context.Accounts
+                    .ToList()
+                    .FirstOrDefault(x => 
+                        x.Username == UsernameOrEmail || 
+                        x.Email == UsernameOrEmail);
+
+                if (account == null)
+                {
+                    return new APIResponse<GetAccountInfoRes>()
+                    {
+                        StatusCode = 404,
+                        Message = "Account does not exist",
+                    };
+                }
+
+                var res = new GetAccountInfoRes();
+                res.Username = account.Username;
+                res.Email = account.Email;
+                res.IsEmailVerified = account.IsEmailVerified;
+                res.Role = account.Role;
+                res.CreateAt = account.CreateAt;
+                res.LastLogin = account.LastLogin;
+                res.ProfilePictureUrl = account.ProfilePictureUrl;
+                res.ResetPasswordToken = account.ResetPasswordToken;
+
+                return new APIResponse<GetAccountInfoRes>
+                {
+                    StatusCode = 200,
+                    Message = "OK",
+                    Data = res
+                };
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<GetAccountInfoRes>()
+                {
+                    StatusCode = 500,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<APIResponse<string>> Create(CreateReq req)
         {
             try
             {
@@ -118,6 +164,7 @@ namespace voting_system_core.Service.Impls
                     .FirstOrDefault(x => 
                         x.Username == loginReq.UserNameOrEmail || 
                         x.Email == loginReq.UserNameOrEmail);
+                
                 if (user == null)
                 {
                     return new APIResponse<LoginRes>
@@ -164,5 +211,10 @@ namespace voting_system_core.Service.Impls
                 };
             }
         }
+
+        //public async Task<APIResponse<string>> ChangePassword(ChangePasswordReq req)
+        //{
+            
+        //} 
     }
 }

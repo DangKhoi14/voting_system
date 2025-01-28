@@ -13,9 +13,11 @@ namespace voting_system_core.Models
 
         [ForeignKey("PollId")]
         public Ulid PollId { get; set; }
+        [NotMapped]
         public Poll Poll { get; set; }
 
         // Navigation Property
+        [NotMapped]
         public List<Vote> Votes { get; set; }
     }
 }

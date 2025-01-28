@@ -8,6 +8,9 @@ namespace voting_system_core.Models
     public class Account
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Ulid UserId { get; set; }
+
         [Required]
         public string Username { get; set; }
 

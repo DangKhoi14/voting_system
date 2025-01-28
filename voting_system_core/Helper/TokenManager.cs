@@ -18,7 +18,7 @@ namespace voting_system_core.Helper
             var secretKey = configuration.GetValue<string>("AppSettings:SecretKey");
             var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
             var options = new DbContextOptionsBuilder<VotingDbContext>()
-                .UseNpgsql(configuration.GetValue<string>("ConnectionString:DefaultConnection"))
+                .UseNpgsql(configuration.GetValue<string>("ConnectionStrings:DefaultConnection"))
                 .Options;
 
             VotingDbContext context = new VotingDbContext(options);
@@ -46,7 +46,7 @@ namespace voting_system_core.Helper
                 TokenId = Guid.NewGuid(),
                 JwtId = token.Id,
                 Token = refreshToken,
-                Username = user.Username,
+                UserId = user.UserId,
                 CreatedAt = DateTime.UtcNow,
                 ExpiryDate = DateTime.UtcNow.AddHours(1),
                 IsRevoked = false,

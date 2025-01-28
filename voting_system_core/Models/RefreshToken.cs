@@ -1,20 +1,19 @@
-﻿
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace voting_system_core.Models
 {
+    [Table("refresh_token")]
     public class RefreshToken
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid TokenId { get; set; }
         public string Token { get; set; }
         public string JwtId { get; set; }
         
-        [ForeignKey("Username")]
-        public string Username { get; set; }
+        [ForeignKey("UserId")]
+        public Ulid UserId { get; set; }
+        [NotMapped]
         public Account Account { get; set; }
 
         public DateTime CreatedAt { get; set; }

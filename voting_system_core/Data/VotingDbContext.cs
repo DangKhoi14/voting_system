@@ -26,21 +26,29 @@ namespace voting_system_core.Data
                 ulid => ulid.ToString(),
                 str => Ulid.Parse(str));
 
-            modelBuilder.Entity<Option>(entity =>
+            modelBuilder.Entity<Account>(entity =>
             {
-                entity.Property(e => e.PollId).HasConversion(ulidConverter);
+                entity.Property(e => e.UserId).HasConversion(ulidConverter);
+            });
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.Property(e => e.UserId).HasConversion(ulidConverter);
             });
             modelBuilder.Entity<Option>(entity =>
             {
+                entity.Property(e => e.PollId).HasConversion(ulidConverter);
                 entity.Property(e => e.OptionId).HasConversion(ulidConverter);
             });
             modelBuilder.Entity<Poll>(entity =>
             {
                 entity.Property(e => e.PollId).HasConversion(ulidConverter);
+                entity.Property(e => e.UserId).HasConversion(ulidConverter);
             });
             modelBuilder.Entity<Vote>(entity =>
             {
                 entity.Property(e => e.VoteId).HasConversion(ulidConverter);
+                entity.Property(e => e.PollId).HasConversion(ulidConverter);
+                entity.Property(e => e.OptionId).HasConversion(ulidConverter);
             });
 
 

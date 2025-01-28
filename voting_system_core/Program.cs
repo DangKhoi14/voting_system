@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
 //builder.Services.AddScoped<IPollService, PollService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IDebugService, DebugService>();
 builder.Services.AddHttpContextAccessor();
 
 //var secretKey = builder.Configuration["AppSettings:SecretKey"];
