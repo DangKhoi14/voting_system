@@ -96,7 +96,7 @@ namespace voting_system_core.Service.Impls
             }
         }
 
-        public async Task<APIResponse<string>> Create(CreateReq req)
+        public async Task<APIResponse<string>> Create(CreateAccountReq req)
         {
             try
             {

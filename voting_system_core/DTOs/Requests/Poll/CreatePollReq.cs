@@ -1,6 +1,6 @@
 ﻿namespace voting_system_core.DTOs.Requests.Poll
 {
-    public class CreateReq
+    public class CreatePollReq
     {
         public string Username { get; set; }
 

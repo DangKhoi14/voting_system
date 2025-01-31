@@ -8,6 +8,6 @@ namespace voting_system_core.Service.Interface
     {
         //Task<APIResponse<GetPollRes>> GetById(Ulid PollId);
         Task<APIResponse<List<GetPollRes>>> GetAll();
-        Task<APIResponse<string>> CreatePoll(CreateReq req);
+        Task<APIResponse<string>> CreatePoll(CreatePollReq req);
     }
 }

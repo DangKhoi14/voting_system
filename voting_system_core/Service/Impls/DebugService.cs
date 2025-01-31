@@ -25,65 +25,34 @@ namespace voting_system_core.Service.Impls
             _configuration = configuration;
         }
 
-        public async Task<APIResponse<RefreshToken>> Test(string Username)
+        public async Task<APIResponse<string>> Test(string name)
         {
-            var user = _context.Accounts.FirstOrDefault(x => x.Username == Username);
-
             try
             {
-                var jwtTokenHandler = new JwtSecurityTokenHandler();
-                var secretKey = _configuration.GetValue<string>("AppSettings:SecretKey");
-                var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
-                var options = new DbContextOptionsBuilder<VotingDbContext>()
-                    .UseNpgsql(_configuration.GetValue<string>("ConnectionStrings:DefaultConnection"))
-                    .Options;
-                VotingDbContext context = new VotingDbContext(options);
+                //var res = new UlidTesting();
 
-                var tokenDescription = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, user.Username),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(ClaimTypes.Name, user.Username)
-                    }),
+                //res.Id = Ulid.NewUlid();
+                //res.Name = name;
 
-                    Expires = DateTime.UtcNow.AddHours(1),
-                    SigningCredentials = new SigningCredentials(
-                        new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
-                };
+                //_context.UlidTestings.Add(res);
+                //_context.SaveChangesAsync();
 
-                var token = jwtTokenHandler.CreateToken(tokenDescription);
-                var accessToken = jwtTokenHandler.WriteToken(token);
-                var refreshToken = GenerateRefreshToken();
-
-                var refreshTokenEntity = new RefreshToken
-                {
-                    TokenId = Guid.NewGuid(),
-                    JwtId = token.Id,
-                    Token = refreshToken,
-                    UserId = user.UserId,
-                    CreatedAt = DateTime.UtcNow,
-                    ExpiryDate = DateTime.UtcNow.AddHours(1),
-                    IsRevoked = false,
-                    IsUsed = false
-                };
-
-                return new APIResponse<RefreshToken>
+                return new APIResponse<string>
                 {
                     StatusCode = 200,
-                    Message = "OK",
-                    Data = refreshTokenEntity,
+                    Message = "Success",
+                    Data = "Ok"
                 };
             }
             catch (Exception ex)
             {
-                return new APIResponse<RefreshToken>
+                return new APIResponse<string>
                 {
                     StatusCode = 500,
                     Message = ex.Message,
                 };
             }
+            
         }
 
         private static string GenerateRefreshToken()

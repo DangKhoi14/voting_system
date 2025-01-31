@@ -17,7 +17,7 @@ namespace voting_system_core.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> CreatePoll(CreateReq req)
+        public async Task<ActionResult> Create(CreatePollReq req)
         {
             return Ok(await _pollService.CreatePoll(req));
         }
@@ -28,8 +28,5 @@ namespace voting_system_core.Controllers
             var res = await _pollService.GetAll();
             return Ok(res);
         }
-
-        //[HttpGet("[action]")]
-        //public async Task<IActionResult> GetByTitle()
     }
 }

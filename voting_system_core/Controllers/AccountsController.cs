@@ -38,7 +38,7 @@ namespace voting_system_core.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Create(CreateReq req)
+        public async Task<ActionResult> Create(CreateAccountReq req)
         {
             var res = await _accountService.Create(req);
             return Ok(res);

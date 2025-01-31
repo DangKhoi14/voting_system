@@ -15,9 +15,9 @@ namespace voting_system_core.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> DebugFunction(string Username)
+        public async Task<IActionResult> DebugFunction(string name)
         {
-            var res = await _testService.Test(Username);
+            var res = await _testService.Test(name);
             return Ok(res);
         }
     }

@@ -63,7 +63,7 @@ namespace voting_system_core.Service.Impls
         //    };
         //}
 
-        public async Task<APIResponse<string>> CreatePoll(CreateReq req)
+        public async Task<APIResponse<string>> CreatePoll(CreatePollReq req)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace voting_system_core.Service.Impls
                 
                 // Need change this later bruh ==================
                 //newPoll.StartTime = req.StartTime;
-                newPoll.StartTime = DateTime.Now;
+                newPoll.StartTime = DateTime.UtcNow;
                 //newPoll.EndTime = req.EndTime;
                 newPoll.EndTime = DateTime.MaxValue;
 
