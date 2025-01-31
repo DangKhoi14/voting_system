@@ -43,5 +43,12 @@ namespace voting_system_core.Controllers
             var res = await _accountService.Create(req);
             return Ok(res);
         }
+
+        //[HttpPut("[action]")]
+        //public async Task<ActionResult> ChangeUsername(ChangeUsernameReq req, [FromQuery] string Username)
+        //{
+        //    var res = await _accountService.ChangeUsername(req, Username);
+        //    return Ok(res);
+        //}
     }
 }

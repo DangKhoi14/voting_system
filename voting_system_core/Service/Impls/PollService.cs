@@ -1,8 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using voting_system_core.Data;
+using voting_system_core.DTOs.Requests.Poll;
 using voting_system_core.DTOs.Responses;
 using voting_system_core.DTOs.Responses.Poll;
+using voting_system_core.Models;
 using voting_system_core.Service.Interface;
 
 namespace voting_system_core.Service.Impls
@@ -10,12 +11,10 @@ namespace voting_system_core.Service.Impls
     public class PollService : IPollService
     {
         private readonly VotingDbContext _context;
-        private readonly IMapper _mapper;
 
-        public PollService(VotingDbContext context, IMapper mapper)
+        public PollService(VotingDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<APIResponse<List<GetPollRes>>> GetAll()
@@ -41,27 +40,73 @@ namespace voting_system_core.Service.Impls
             };
         }
 
-        public async Task<APIResponse<GetPollRes>> GetById(Ulid PollId)
-        {
-            var poll = await _context.Polls.FindAsync(PollId);
+        //public async Task<APIResponse<GetPollRes>> GetByTitle(Ulid PollId)
+        //{
+        //    var poll = await _context.Polls.FindAsync(PollId);
 
-            if (poll == null)
+        //    if (poll == null)
+        //    {
+        //        return new APIResponse<GetPollRes>
+        //        {
+        //            StatusCode = 404,
+        //            Message = "Poll not found",
+        //        };
+        //    }
+
+        //    var item = _mapper.Map<GetPollRes>(poll);
+
+        //    return new APIResponse<GetPollRes>
+        //    {
+        //        StatusCode = 200,
+        //        Message = "OK",
+        //        Data = item
+        //    };
+        //}
+
+        public async Task<APIResponse<string>> CreatePoll(CreateReq req)
+        {
+            try
             {
-                return new APIResponse<GetPollRes>
+                var newPoll = new Poll();
+                newPoll.PollId = Ulid.NewUlid();
+                var user = _context.Accounts.FirstOrDefault(x => x.Username == req.Username);
+                if (user == null)
                 {
-                    StatusCode = 404,
-                    Message = "Poll not found",
+                    return new APIResponse<string>
+                    {
+                        StatusCode = 400,
+                        Message = "User not found"
+                    };
+                }
+                newPoll.UserId = user.UserId;
+                newPoll.Title = req.Title;
+                newPoll.Description = req.Description;
+                
+                // Need change this later bruh ==================
+                //newPoll.StartTime = req.StartTime;
+                newPoll.StartTime = DateTime.Now;
+                //newPoll.EndTime = req.EndTime;
+                newPoll.EndTime = DateTime.MaxValue;
+
+                _context.Polls.Add(newPoll);
+
+                await _context.SaveChangesAsync();
+
+                return new APIResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "OK",
+                    Data = "Success"
                 };
             }
-
-            var item = _mapper.Map<GetPollRes>(poll);
-
-            return new APIResponse<GetPollRes>
+            catch (Exception ex)
             {
-                StatusCode = 200,
-                Message = "OK",
-                Data = item
-            };
+                return new APIResponse<string>
+                {
+                    StatusCode = 500,
+                    Message = ex.Message,
+                };
+            }
         }
     }
 }

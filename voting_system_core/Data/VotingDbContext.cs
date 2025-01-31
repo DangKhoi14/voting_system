@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using voting_system_core.Models;
-using AutoMapper.Execution;
-using System;
 using Newtonsoft.Json;
 
 namespace voting_system_core.Data
@@ -22,38 +20,47 @@ namespace voting_system_core.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // ULID <-> VARCHAR(26) Converter
             var ulidConverter = new ValueConverter<Ulid, string>(
-                ulid => ulid.ToString(),
-                str => Ulid.Parse(str)
+                ulid => ulid.ToString(),  // Store as string (VARCHAR)
+                str => Ulid.Parse(str)     // Convert back to Ulid in C#
             );
 
-            modelBuilder.Entity<Account>(entity =>
-            {
-                entity.Property(e => e.UserId).HasConversion(ulidConverter);
-            });
-            modelBuilder.Entity<RefreshToken>(entity =>
-            {
-                entity.Property(e => e.UserId).HasConversion(ulidConverter);
-            });
-            modelBuilder.Entity<Option>(entity =>
-            {
-                entity.Property(e => e.PollId).HasConversion(ulidConverter);
-                entity.Property(e => e.OptionId).HasConversion(ulidConverter);
-            });
+            // Apply ULID conversion
             modelBuilder.Entity<Poll>(entity =>
             {
-                entity.Property(e => e.PollId).HasConversion(ulidConverter);
-                entity.Property(e => e.UserId).HasConversion(ulidConverter);
+                entity.Property(e => e.PollId)
+                      .HasConversion(ulidConverter)
+                      .HasMaxLength(26);
             });
+
+            modelBuilder.Entity<Option>(entity =>
+            {
+                entity.Property(e => e.PollId)
+                      .HasConversion(ulidConverter)
+                      .HasMaxLength(26);
+
+                entity.Property(e => e.OptionId)
+                      .HasConversion(ulidConverter)
+                      .HasMaxLength(26);
+            });
+
             modelBuilder.Entity<Vote>(entity =>
             {
-                entity.Property(e => e.VoteId).HasConversion(ulidConverter);
-                entity.Property(e => e.PollId).HasConversion(ulidConverter);
-                entity.Property(e => e.OptionId).HasConversion(ulidConverter);
+                entity.Property(e => e.VoteId)
+                      .HasConversion(ulidConverter)
+                      .HasMaxLength(26);
+
+                entity.Property(e => e.PollId)
+                      .HasConversion(ulidConverter)
+                      .HasMaxLength(26);
+
+                entity.Property(e => e.OptionId)
+                      .HasConversion(ulidConverter)
+                      .HasMaxLength(26);
             });
 
-
-
+            // Role entity
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.Key);
@@ -61,6 +68,7 @@ namespace voting_system_core.Data
                 entity.Property(e => e.Authority);
             });
 
+            // Relationships
             modelBuilder.Entity<Poll>()
                 .HasMany(p => p.Options)
                 .WithOne(p => p.Poll)
@@ -78,6 +86,7 @@ namespace voting_system_core.Data
         }
     }
 
+    // JSONB Converter (if you need it for other fields)
     public class JsonbValueConverter<T> : ValueConverter<T, string>
     {
         public JsonbValueConverter()

@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 });
 
 // Services
-//builder.Services.AddScoped<IPollService, PollService>();
+builder.Services.AddScoped<IPollService, PollService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IDebugService, DebugService>();

@@ -7,7 +7,6 @@ namespace voting_system_core.Models
     public class Option
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Ulid OptionId { get; set; }
         public string OptionText { get; set; }
 

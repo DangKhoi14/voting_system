@@ -7,7 +7,6 @@ namespace voting_system_core.Models
     public class Vote
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Ulid VoteId { get; set; } 
         public string Email { get; set; }
         public bool IsVerified { get; set; }
@@ -17,7 +16,7 @@ namespace voting_system_core.Models
         [NotMapped]
         public Poll Poll { get; set; }
 
-        [ForeignKey("OprionId")]
+        [ForeignKey("OptionId")]
         public Ulid OptionId { get; set; }
         [NotMapped]
         public Option Option { get; set; }

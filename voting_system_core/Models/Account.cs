@@ -9,7 +9,7 @@ namespace voting_system_core.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Ulid UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         public string Username { get; set; }

@@ -11,5 +11,6 @@ namespace voting_system_core.Service.Interface
         Task<APIResponse<GetAccountInfoRes>> GetAccountInfo(string UsernameOrEmail);
         Task<APIResponse<LoginRes>> Login(LoginReq loginReq);
         Task<APIResponse<string>> Create(CreateReq createReq);
+        Task<APIResponse<string>> ChangeUsername(ChangeUsernameReq req, string Username);
     }
 }

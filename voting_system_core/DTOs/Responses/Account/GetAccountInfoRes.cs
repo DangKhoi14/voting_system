@@ -15,7 +15,5 @@
         public DateTime LastLogin { get; set; }
 
         public string? ProfilePictureUrl { get; set; }
-
-        public string? ResetPasswordToken { get; set; }
     }
 }

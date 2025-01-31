@@ -55,11 +55,11 @@ namespace voting_system_core.Service.Impls
         {
             try
             {
-                var account = _context.Accounts
-                    .ToList()
-                    .FirstOrDefault(x => 
+                var account = await _context.Accounts
+                    .Where(x => 
                         x.Username == UsernameOrEmail || 
-                        x.Email == UsernameOrEmail);
+                        x.Email == UsernameOrEmail)
+                    .FirstOrDefaultAsync();
 
                 if (account == null)
                 {
@@ -78,7 +78,6 @@ namespace voting_system_core.Service.Impls
                 res.CreateAt = account.CreateAt;
                 res.LastLogin = account.LastLogin;
                 res.ProfilePictureUrl = account.ProfilePictureUrl;
-                res.ResetPasswordToken = account.ResetPasswordToken;
 
                 return new APIResponse<GetAccountInfoRes>
                 {
@@ -207,6 +206,51 @@ namespace voting_system_core.Service.Impls
                 };
             }
         }
+
+        public async Task<APIResponse<string>> ChangeUsername(ChangeUsernameReq req, string Username)
+        {
+            try
+            {
+                //var acc = _context.Accounts
+                //    .Where(x => x.Username == req.Username)
+                //    .FirstOrDefaultAsync();
+
+                var acc = _context.Accounts.FirstOrDefault(x => x.Username == Username);
+
+                if (acc == null)
+                {
+                    return new APIResponse<string>
+                    {
+                        StatusCode = 400,
+                        Message = $"User {Username} not found"
+                    };
+                }
+
+                acc.Username = req.NewUserName;
+                _context.Accounts.Update(acc);
+                await _context.SaveChangesAsync();
+
+                return new APIResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Success",
+                    Data = acc.Username
+                };
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<string>
+                {
+                    StatusCode = 500,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        //public async Task<APIResponse<string>> ChangeEmail(ChangeEmailReq req, string Username)
+        //{
+
+        //}
 
         //public async Task<APIResponse<string>> ChangePassword(ChangePasswordReq req)
         //{

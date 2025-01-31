@@ -12,7 +12,7 @@ namespace voting_system_core.Models
         public string JwtId { get; set; }
         
         [ForeignKey("UserId")]
-        public Ulid UserId { get; set; }
+        public Guid UserId { get; set; }
         [NotMapped]
         public Account Account { get; set; }
 

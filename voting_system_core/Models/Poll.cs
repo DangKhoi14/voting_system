@@ -1,18 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace voting_system_core.Models
 {
     [Table("poll")]
     public class Poll
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Ulid PollId { get; set; }
 
         [ForeignKey("UserId")]
-        public Ulid UserId { get; set; }
+        public Guid UserId { get; set; }
         
         [NotMapped]
         public Account Account { get; set; }
@@ -21,6 +19,8 @@ namespace voting_system_core.Models
         public string Description { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+
+        [NotMapped]
         public bool IsActive => DateTime.Now >= StartTime && DateTime.Now <= EndTime;
 
         // Navigation Properties
