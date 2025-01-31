@@ -20,6 +20,9 @@ A web application that allows users to create and participate in polls. Built wi
 - Develop a mobile application
 - Enhance security and scalability
 
+## Open-Source Database
+- The database used in this project is public and open-source. You can access and contribute to its schema and data structure.
+
 ## Getting Started
 ### Prerequisites
 - .NET SDK (latest version)
