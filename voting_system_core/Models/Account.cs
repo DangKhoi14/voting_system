@@ -27,6 +27,7 @@ namespace voting_system_core.Models
         public bool IsEmailVerified { get; set; }
 
         // Additional attributes
+        [ForeignKey("Role")]
         public sbyte Role { get; set; }
 
         public DateTime LastLogin { get; set; }

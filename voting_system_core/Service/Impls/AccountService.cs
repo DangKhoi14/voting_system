@@ -142,7 +142,7 @@ namespace voting_system_core.Service.Impls
             }
         }
 
-        public async Task<APIResponse<LoginRes>> Login(LoginReq loginReq) 
+        public async Task<APIResponse<LoginRes>> Login(LoginReq loginReq)
         {
             try
             {
@@ -151,32 +151,26 @@ namespace voting_system_core.Service.Impls
                     return new APIResponse<LoginRes>
                     {
                         StatusCode = 400,
-                        Message = "Username or Email is required"
+                        Message = "Invalid credentials"
                     };
                 }
 
-                var user = _context.Accounts
-                    .FirstOrDefault(x => 
-                        x.Username == loginReq.UserNameOrEmail || 
-                        x.Email == loginReq.UserNameOrEmail);
-                
-                if (user == null)
-                {
-                    return new APIResponse<LoginRes>
-                    {
-                        StatusCode = 200,
-                        Message = $"User does not exist",
-                    };
-                }
+                // Fetch user only by Username or Email
+                var user = _context.Accounts.FirstOrDefault(x =>
+                    x.Username == loginReq.UserNameOrEmail ||
+                    x.Email == loginReq.UserNameOrEmail);
 
-                bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginReq.Password, user.Password);
-                
-                if (!isValidPassword)
+                // Always perform a hash check, even if user is null, to prevent timing attacks
+                bool isValidPassword = user != null && BCrypt.Net.BCrypt.Verify(loginReq.Password, user.Password);
+
+                // Return the same response for both invalid username and password
+                if (user == null || !isValidPassword)
                 {
+                    await Task.Delay(500); // Add a small delay to prevent brute force attacks
                     return new APIResponse<LoginRes>
                     {
-                        StatusCode = 401,
-                        Message = "Password is wrong",
+                        StatusCode = 401, // Unauthorized
+                        Message = "Invalid credentials"
                     };
                 }
 
@@ -189,6 +183,11 @@ namespace voting_system_core.Service.Impls
                         Message = "Failed to generate token"
                     };
                 }
+
+                // Change LastLogin when completely Login
+                user.LastLogin = DateTime.UtcNow;
+                _context.Accounts.Update(user);
+                await _context.SaveChangesAsync();
 
                 return new APIResponse<LoginRes>
                 {

@@ -11,10 +11,12 @@ namespace voting_system_core.Service.Impls
     public class PollService : IPollService
     {
         private readonly VotingDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PollService(VotingDbContext context)
+        public PollService(VotingDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<APIResponse<List<GetPollRes>>> GetAll()
@@ -39,6 +41,11 @@ namespace voting_system_core.Service.Impls
                 Data = res
             };
         }
+
+        //public async Task<APIResponse<List<GetPollRes>>> GetAllPollsOfCurrentUser(Guid UserId)
+        //{
+
+        //}
 
         //public async Task<APIResponse<GetPollRes>> GetByTitle(Ulid PollId)
         //{

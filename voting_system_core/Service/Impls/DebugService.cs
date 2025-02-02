@@ -18,30 +18,27 @@ namespace voting_system_core.Service.Impls
     {
         private readonly VotingDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DebugService(VotingDbContext context, IConfiguration configuration)
+        public DebugService(VotingDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<APIResponse<string>> Test(string name)
+        public async Task<APIResponse<string>> Test()
         {
             try
             {
-                //var res = new UlidTesting();
-
-                //res.Id = Ulid.NewUlid();
-                //res.Name = name;
-
-                //_context.UlidTestings.Add(res);
-                //_context.SaveChangesAsync();
+                var currentUser = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var Id = _httpContextAccessor.HttpContext.User.FindFirstValue("UserId").ToString();
 
                 return new APIResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Success",
-                    Data = "Ok"
+                    Data = Id
                 };
             }
             catch (Exception ex)
