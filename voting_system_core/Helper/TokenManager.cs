@@ -27,6 +27,7 @@ namespace voting_system_core.Helper
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim("UserId", user.UserId.ToString()),
                     new Claim(ClaimTypes.NameIdentifier, user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(ClaimTypes.Name, user.Username)

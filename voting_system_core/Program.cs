@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using voting_system_core.Data;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +41,35 @@ builder.Logging.AddDebug(); // Log to debug output
 builder.Services.AddDbContext<VotingDbContext>(options
     => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var secretKey = builder.Configuration["Appsettings:SecretKey"];
+var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+            ClockSkew = TimeSpan.Zero
+        };
+        opt.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                string authorizationHeader = context.Request.Headers["Authorization"];
+                if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
+                {
+                    string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                    context.Token = token;
+                }
 
+                return Task.CompletedTask;
+            }
+        };
+    });
 
 var app = builder.Build();
 app.UseCors("AllowOrigin");
