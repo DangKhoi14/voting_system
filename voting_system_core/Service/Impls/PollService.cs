@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using voting_system_core.Data;
 using voting_system_core.DTOs.Requests.Poll;
 using voting_system_core.DTOs.Responses;
@@ -47,53 +48,72 @@ namespace voting_system_core.Service.Impls
 
         //}
 
-        //public async Task<APIResponse<GetPollRes>> GetByTitle(Ulid PollId)
-        //{
-        //    var poll = await _context.Polls.FindAsync(PollId);
+        public async Task<APIResponse<GetPollRes>> GetByTitle(Ulid PollId)
+        {
+            var poll = await _context.Polls.FindAsync(PollId);
 
-        //    if (poll == null)
-        //    {
-        //        return new APIResponse<GetPollRes>
-        //        {
-        //            StatusCode = 404,
-        //            Message = "Poll not found",
-        //        };
-        //    }
+            if (poll == null)
+            {
+                return new APIResponse<GetPollRes>
+                {
+                    StatusCode = 404,
+                    Message = "Poll not found",
+                };
+            }
 
-        //    var item = _mapper.Map<GetPollRes>(poll);
+            var item = new GetPollRes();
+            item.PollId = poll.PollId;
+            item.UserId = poll.UserId;
+            item.Title = poll.Title;
+            item.Description = poll.Description;
+            item.StartTime = poll.StartTime;
+            item.EndTime = poll.EndTime;
 
-        //    return new APIResponse<GetPollRes>
-        //    {
-        //        StatusCode = 200,
-        //        Message = "OK",
-        //        Data = item
-        //    };
-        //}
+            return new APIResponse<GetPollRes>
+            {
+                StatusCode = 200,
+                Message = "OK",
+                Data = item
+            };
+        }
 
         public async Task<APIResponse<string>> CreatePoll(CreatePollReq req)
         {
             try
             {
-                var newPoll = new Poll();
-                newPoll.PollId = Ulid.NewUlid();
-                var user = _context.Accounts.FirstOrDefault(x => x.Username == req.Username);
-                if (user == null)
+                var user = _httpContextAccessor.HttpContext?.User;
+
+                if (user == null || !user.Identity.IsAuthenticated)
+                {
+                    return new APIResponse<string>
+                    {
+                        StatusCode = 401,
+                        Message = "Unauthorized"
+                    };
+                }
+
+                var userIdStr = user.FindFirstValue("UserId");
+
+                if (!Guid.TryParse(userIdStr, out Guid UserId))
                 {
                     return new APIResponse<string>
                     {
                         StatusCode = 400,
-                        Message = "User not found"
+                        Message = "Invalid UserId"
                     };
                 }
-                newPoll.UserId = user.UserId;
+
+                var newPoll = new Poll();
+                newPoll.PollId = Ulid.NewUlid();
+                newPoll.UserId = UserId;
                 newPoll.Title = req.Title;
                 newPoll.Description = req.Description;
-                
+
                 // Need change this later bruh ==================
-                //newPoll.StartTime = req.StartTime;
-                newPoll.StartTime = DateTime.UtcNow;
-                //newPoll.EndTime = req.EndTime;
-                newPoll.EndTime = DateTime.MaxValue;
+                newPoll.StartTime = req.StartTime;
+                //newPoll.StartTime = DateTime.UtcNow;
+                newPoll.EndTime = req.EndTime;
+                //newPoll.EndTime = DateTime.MaxValue;
 
                 _context.Polls.Add(newPoll);
 

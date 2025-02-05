@@ -17,8 +17,8 @@ namespace voting_system_core.Controllers
             _pollService = pollService;
         }
 
+        //[Authorize]
         [HttpPost("[action]")]
-        [Authorize]
         public async Task<ActionResult> Create(CreatePollReq req)
         {
             return Ok(await _pollService.CreatePoll(req));

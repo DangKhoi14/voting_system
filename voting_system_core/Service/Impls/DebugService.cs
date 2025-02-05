@@ -32,13 +32,13 @@ namespace voting_system_core.Service.Impls
             try
             {
                 var currentUser = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var Id = _httpContextAccessor.HttpContext.User.FindFirstValue("UserId").ToString();
+                //var Id = _httpContextAccessor.HttpContext.User.FindFirstValue("UserId");
 
                 return new APIResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Success",
-                    Data = Id
+                    Data = currentUser
                 };
             }
             catch (Exception ex)
