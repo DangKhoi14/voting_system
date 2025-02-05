@@ -6,7 +6,8 @@ namespace voting_system_core.Service.Interface
 {
     public interface IPollService
     {
-        //Task<APIResponse<GetPollRes>> GetById(Ulid PollId);
+        Task<APIResponse<List<GetPollRes>>> GetByTitle(string title);
+        Task<APIResponse<List<GetPollRes>>> GetAllPollsOfCurrentUser();
         Task<APIResponse<List<GetPollRes>>> GetAll();
         Task<APIResponse<string>> CreatePoll(CreatePollReq req);
     }

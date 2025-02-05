@@ -43,37 +43,73 @@ namespace voting_system_core.Service.Impls
             };
         }
 
-        //public async Task<APIResponse<List<GetPollRes>>> GetAllPollsOfCurrentUser(Guid UserId)
-        //{
-
-        //}
-
-        public async Task<APIResponse<GetPollRes>> GetByTitle(Ulid PollId)
+        public async Task<APIResponse<List<GetPollRes>>> GetAllPollsOfCurrentUser()
         {
-            var poll = await _context.Polls.FindAsync(PollId);
+            var user = _httpContextAccessor.HttpContext?.User;
 
-            if (poll == null)
+            if (user == null || !user.Identity.IsAuthenticated)
             {
-                return new APIResponse<GetPollRes>
+                return new APIResponse<List<GetPollRes>>
                 {
-                    StatusCode = 404,
-                    Message = "Poll not found",
+                    StatusCode = 401,
+                    Message = "Unauthorized"
                 };
             }
 
-            var item = new GetPollRes();
-            item.PollId = poll.PollId;
-            item.UserId = poll.UserId;
-            item.Title = poll.Title;
-            item.Description = poll.Description;
-            item.StartTime = poll.StartTime;
-            item.EndTime = poll.EndTime;
+            var UserId = Guid.Parse(user.FindFirstValue("UserId"));
 
-            return new APIResponse<GetPollRes>
+            var polls = await _context.Polls
+                .Where(x => x.UserId == UserId)
+                .ToListAsync();
+
+            var pollList = polls.Select(p => new GetPollRes
+            {
+                PollId = p.PollId,
+                UserId = p.UserId,
+                Title = p.Title,
+                Description = p.Description,
+                StartTime = p.StartTime,
+                EndTime = p.EndTime
+            }).ToList();
+
+            return new APIResponse<List<GetPollRes>>
             {
                 StatusCode = 200,
                 Message = "OK",
-                Data = item
+                Data = pollList
+            };
+        }
+
+        public async Task<APIResponse<List<GetPollRes>>> GetByTitle(string title)
+        {
+            var polls = await _context.Polls
+                .Where(x => x.Title == title)
+                .ToListAsync();
+
+            if (!polls.Any())
+            {
+                return new APIResponse<List<GetPollRes>>
+                {
+                    StatusCode = 404,
+                    Message = "No polls found with the given title",
+                };
+            }
+
+            var pollList = polls.Select(p => new GetPollRes
+            {
+                PollId = p.PollId,
+                UserId = p.UserId,
+                Title = p.Title,
+                Description = p.Description,
+                StartTime = p.StartTime,
+                EndTime = p.EndTime
+            }).ToList();
+
+            return new APIResponse<List<GetPollRes>>
+            {
+                StatusCode = 200,
+                Message = "OK",
+                Data = pollList
             };
         }
 
@@ -103,20 +139,31 @@ namespace voting_system_core.Service.Impls
                     };
                 }
 
-                var newPoll = new Poll();
-                newPoll.PollId = Ulid.NewUlid();
-                newPoll.UserId = UserId;
-                newPoll.Title = req.Title;
-                newPoll.Description = req.Description;
+                // Check if an active poll with the same title exists for this user
+                var existingPoll = await _context.Polls
+                    .Where(p => p.UserId == UserId && p.Title == req.Title)
+                    .FirstOrDefaultAsync();
 
-                // Need change this later bruh ==================
-                newPoll.StartTime = req.StartTime;
-                //newPoll.StartTime = DateTime.UtcNow;
-                newPoll.EndTime = req.EndTime;
-                //newPoll.EndTime = DateTime.MaxValue;
+                if (existingPoll != null && existingPoll.IsActive)
+                {
+                    return new APIResponse<string>
+                    {
+                        StatusCode = 400,
+                        Message = "You already have an active poll with this title."
+                    };
+                }
+
+                var newPoll = new Poll
+                {
+                    PollId = Ulid.NewUlid(),
+                    UserId = UserId,
+                    Title = req.Title,
+                    Description = req.Description,
+                    StartTime = req.StartTime,
+                    EndTime = req.EndTime
+                };
 
                 _context.Polls.Add(newPoll);
-
                 await _context.SaveChangesAsync();
 
                 return new APIResponse<string>
