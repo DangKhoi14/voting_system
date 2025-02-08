@@ -24,9 +24,10 @@ builder.Services.AddCors(options =>
 });
 
 // Services
-builder.Services.AddScoped<IPollService, PollService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IPollService, PollService>();
+builder.Services.AddScoped<IOptionService, OptionService>();
 builder.Services.AddScoped<IDebugService, DebugService>();
 builder.Services.AddHttpContextAccessor();
 
