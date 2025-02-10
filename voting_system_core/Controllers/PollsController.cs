@@ -47,5 +47,14 @@ namespace voting_system_core.Controllers
             var res = await _pollService.GetAll();
             return Ok(res);
         }
+
+
+        //[Authorize]
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> Delete(DeletePollReq req)
+        {
+            var res = await _pollService.DeletePoll(req);
+            return Ok(res);
+        }
     }
 }

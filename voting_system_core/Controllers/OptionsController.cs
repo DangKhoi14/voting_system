@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using voting_system_core.DTOs.Requests.Option;
 using voting_system_core.Service.Interface;
 
 namespace voting_system_core.Controllers
@@ -13,6 +14,16 @@ namespace voting_system_core.Controllers
         {
             _optionService = optionService;
         }
+
+
+        //[Authorize]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateOption(CreateOptionReq req)
+        {
+            var res = await _optionService.CreateOption(req);
+            return Ok(res);
+        }
+
 
         [HttpGet("[action]")]
         public async Task<IActionResult> GetOptionsByPollId(string PollId)
