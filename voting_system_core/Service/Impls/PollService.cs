@@ -6,7 +6,6 @@ using voting_system_core.DTOs.Responses;
 using voting_system_core.DTOs.Responses.Poll;
 using voting_system_core.Models;
 using voting_system_core.Service.Interface;
-using voting_system_core.Service.Impls;
 
 namespace voting_system_core.Service.Impls
 {
@@ -169,8 +168,6 @@ namespace voting_system_core.Service.Impls
 
             _context.Polls.Add(newPoll);
             await _context.SaveChangesAsync();
-
-            //Delete Options and Votes of the poll
 
             return new APIResponse<string>
             {
