@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using voting_system_core.Service.Interface;
+using voting_system_core.DTOs.Requests.Vote;
 
 namespace voting_system_core.Controllers
 {
@@ -7,5 +9,18 @@ namespace voting_system_core.Controllers
     [ApiController]
     public class VotesController : ControllerBase
     {
+        private readonly IVoteService _voteService;
+
+        public VotesController(IVoteService voteService)
+        {
+            _voteService = voteService;
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Vote(VoteReq voteReq)
+        {
+            var res = await _voteService.Vote(voteReq);
+            return Ok(res);
+        }
     }
 }

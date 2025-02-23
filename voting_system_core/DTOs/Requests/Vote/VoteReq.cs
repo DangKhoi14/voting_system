@@ -2,7 +2,7 @@
 {
     public class VoteReq
     {
-        public Ulid PollId { get; set; }
-        public Ulid OptionId { get; set; }
+        public string PollId { get; set; }
+        public string OptionId { get; set; }
     }
 }

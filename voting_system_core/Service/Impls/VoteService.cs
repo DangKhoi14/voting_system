@@ -8,7 +8,7 @@ using voting_system_core.Service.Interface;
 
 namespace voting_system_core.Service.Impls
 {
-    public class VoteService
+    public class VoteService : IVoteService
     {
         private readonly VotingDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,6 +23,7 @@ namespace voting_system_core.Service.Impls
         {
             var user = _httpContextAccessor.HttpContext?.User;
 
+            // check authentication
             if (user == null || !user.Identity.IsAuthenticated)
             {
                 return new APIResponse<string>
@@ -32,17 +33,22 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
-            if (voteReq.PollId == null || voteReq.OptionId == null)
+            // email now is null, need fix 
+            var email = user.FindFirstValue(ClaimTypes.Email);
+
+
+            if (!Ulid.TryParse(voteReq.PollId, out var pollId) || !Ulid.TryParse(voteReq.OptionId, out var optionId))
             {
                 return new APIResponse<string>
                 {
                     StatusCode = 400,
-                    Message = "Bad Request"
+                    Message = "Invalid PollId or OptionId"
                 };
             }
 
-            var poll = await _context.Polls.FirstOrDefaultAsync(p => p.PollId == voteReq.PollId);
+            var poll = await _context.Polls.FirstOrDefaultAsync(p => p.PollId == pollId);
 
+            // check if poll exists
             if (poll == null)
             {
                 return new APIResponse<string>
@@ -52,7 +58,8 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
-            if (poll.EndTime < DateTime.Now)
+            // check if poll has ended
+            if (poll.EndTime < DateTime.UtcNow)
             {
                 return new APIResponse<string>
                 {
@@ -61,35 +68,67 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
-            var option = await _context.Options.FirstOrDefaultAsync(o => o.OptionId == voteReq.OptionId);
+            var option = await _context.Options.FirstOrDefaultAsync(o => o.OptionId == optionId && o.PollId == poll.PollId);
 
+            // check if option exists
             if (option == null)
             {
                 return new APIResponse<string>
                 {
                     StatusCode = 404,
-                    Message = "Option not found"
+                    Message = "Option not found or does not belong to this poll"
                 };
             }
 
-            var vote = new Vote
-            {
-                VoteId = Ulid.NewUlid(),
-                Email = user.FindFirst(ClaimTypes.Email).Value,
-                IsVerified = false,
-                PollId = poll.PollId,
-                OptionId = option.OptionId
-            };
+            var voted = await _context.Votes.AnyAsync(v => v.PollId == poll.PollId && v.Email == email);
 
-            _context.Votes.Add(vote);
-            await _context.SaveChangesAsync();
-
-            return new APIResponse<string>
+            // check if user has already voted
+            if (voted)
             {
-                StatusCode = 200,
-                Message = "OK",
-                Data = "Success"
-            };
+                return new APIResponse<string>
+                {
+                    StatusCode = 409,
+                    Message = "Already voted"
+                };
+            }
+
+            // Transaction
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var vote = new Vote
+                {
+                    VoteId = Ulid.NewUlid(),
+                    Email = email,
+                    IsVerified = false,
+                    PollId = poll.PollId,
+                    OptionId = option.OptionId
+                };
+
+                _context.Votes.Add(vote);
+                await _context.SaveChangesAsync();
+
+                // Commit transaction after saving changes
+                await transaction.CommitAsync();
+
+                return new APIResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "OK",
+                    Data = "Success"
+                };
+            }
+            catch (Exception ex)
+            {
+                // Rollback if exception occurs
+                await transaction.RollbackAsync();
+                return new APIResponse<string>
+                {
+                    StatusCode = 500,
+                    Message = "Internal Server Error",
+                    Data = ex.Message
+                };
+            }
         }
     }
 }
