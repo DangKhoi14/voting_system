@@ -76,16 +76,6 @@ namespace voting_system_core.Service.Impls
         }
 
 
-        public async Task DeleteOptionAndAllVotesOfIt(Option opt)
-        {
-            var votes = _context.Votes.Where(v => v.OptionId == opt.OptionId);
-            _context.Votes.RemoveRange(votes);
-            _context.Options.Remove(opt);
-
-            await _context.SaveChangesAsync();
-        }
-
-
         public async Task<APIResponse<string>> DeleteOption(string OptionId)
         {
             var user = _httpContextAccessor.HttpContext?.User;
@@ -128,7 +118,8 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
-            DeleteOptionAndAllVotesOfIt(option);
+            _context.Options.Remove(option);
+            await _context.SaveChangesAsync();
 
             return new APIResponse<string>
             {

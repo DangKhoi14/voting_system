@@ -227,6 +227,16 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
+            // Check if the poll is active
+            if (poll.StartTime <= DateTime.Now && DateTime.Now <= poll.EndTime)
+            {
+                return new APIResponse<string>
+                {
+                    StatusCode = 400,
+                    Message = "Cannot delete an active poll"
+                };
+            }
+
             // Delete all options (and their votes) before deleting the poll
             if (poll.Options != null && poll.Options.Any())
             {
