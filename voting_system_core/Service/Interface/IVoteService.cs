@@ -5,6 +5,6 @@ namespace voting_system_core.Service.Interface
 {
     public interface IVoteService
     {
-        Task<APIResponse<string>> Vote(VoteReq voteReq);
+        Task<APIResponse<string>> AuthenticatedVote(VoteReq voteReq);
     }
 }

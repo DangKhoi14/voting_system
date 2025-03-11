@@ -17,9 +17,9 @@ namespace voting_system_core.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Vote(VoteReq voteReq)
+        public async Task<IActionResult> AuthenticatedVote(VoteReq voteReq)
         {
-            var res = await _voteService.Vote(voteReq);
+            var res = await _voteService.AuthenticatedVote(voteReq);
             return Ok(res);
         }
     }

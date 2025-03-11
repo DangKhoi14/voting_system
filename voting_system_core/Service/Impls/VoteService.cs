@@ -19,7 +19,7 @@ namespace voting_system_core.Service.Impls
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<APIResponse<string>> Vote(VoteReq voteReq)
+        public async Task<APIResponse<string>> AuthenticatedVote(VoteReq voteReq)
         {
             var user = _httpContextAccessor.HttpContext?.User;
 
@@ -33,9 +33,8 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
-            // email now is null, need fix 
+            var userId = user.FindFirstValue("UserId");
             var email = user.FindFirstValue(ClaimTypes.Email);
-
 
             if (!Ulid.TryParse(voteReq.PollId, out var pollId) || !Ulid.TryParse(voteReq.OptionId, out var optionId))
             {
@@ -58,6 +57,16 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
+            // check if poll has started
+            if (poll.StartTime > DateTime.UtcNow)
+            {
+                return new APIResponse<string>
+                {
+                    StatusCode = 400,
+                    Message = "Poll has not started"
+                };
+            }
+
             // check if poll has ended
             if (poll.EndTime < DateTime.UtcNow)
             {
@@ -77,6 +86,15 @@ namespace voting_system_core.Service.Impls
                 {
                     StatusCode = 404,
                     Message = "Option not found or does not belong to this poll"
+                };
+            }
+
+            if (poll.UserId.ToString() == userId)
+            {
+                return new APIResponse<string>
+                {
+                    StatusCode = 403,
+                    Message = "Poll owner cannot vote"
                 };
             }
 
@@ -130,5 +148,10 @@ namespace voting_system_core.Service.Impls
                 };
             }
         }
+
+        //public async Task<APIResponse<string>> AnonymousVote(VoteReq voteReq)
+        //{
+
+        //}
     }
 }

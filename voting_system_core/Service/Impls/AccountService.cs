@@ -117,6 +117,7 @@ namespace voting_system_core.Service.Impls
 
                 newAcc.Username = req.Username;
                 newAcc.Email = req.Email;
+                newAcc.FirstEmail = req.Email;
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
                 newAcc.Password = passwordHash;
                 newAcc.CreateAt = DateOnly.FromDateTime(DateTime.Now);
@@ -159,6 +160,16 @@ namespace voting_system_core.Service.Impls
                 var user = _context.Accounts.FirstOrDefault(x =>
                     x.Username == loginReq.UserNameOrEmail ||
                     x.Email == loginReq.UserNameOrEmail);
+
+                // Check if user is deleted
+                if (user.IsDeleted)
+                {
+                    return new APIResponse<LoginRes>
+                    {
+                        StatusCode = 400,
+                        Message = "Invalid credentials"
+                    };
+                }
 
                 // Always perform a hash check, even if user is null, to prevent timing attacks
                 bool isValidPassword = user != null && BCrypt.Net.BCrypt.Verify(loginReq.Password, user.Password);

@@ -22,6 +22,8 @@ namespace voting_system_core.Models
 
         public string? Email { get; set; }
 
+        public string FirstEmail { get; set; }
+
         public DateOnly CreateAt { get; set; }
 
         public bool IsEmailVerified { get; set; }
@@ -33,6 +35,8 @@ namespace voting_system_core.Models
         public DateTime LastLogin { get; set; }
 
         //public bool IsActive { get; set; } = true;
+
+        public bool IsDeleted { get; set; }
 
         public string? ProfilePictureUrl { get; set; }
 

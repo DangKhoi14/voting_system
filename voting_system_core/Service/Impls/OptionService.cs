@@ -118,6 +118,16 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
+            // Can not change option after poll has started
+            if (poll.StartTime < DateTime.UtcNow)
+            {
+                return new APIResponse<string>
+                {
+                    StatusCode = 400,
+                    Message = "Poll has started"
+                };
+            }
+
             DeleteOptionAndAllVotesOfIt(option);
 
             return new APIResponse<string>
