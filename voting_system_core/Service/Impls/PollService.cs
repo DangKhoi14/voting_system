@@ -24,24 +24,27 @@ namespace voting_system_core.Service.Impls
 
         public async Task<APIResponse<List<GetPollRes>>> GetAll()
         {
-            var polls = await _context.Polls.ToListAsync();
-
-            var res = polls.Select(poll => new GetPollRes
-            {
-                PollId = poll.PollId,
-                UserId = poll.UserId,
-                Title = poll.Title,
-                Description = poll.Description,
-                StartTime = poll.StartTime,
-                EndTime = poll.EndTime,
-
-            }).ToList();
+            var polls = await _context.Polls
+                .Select(poll => new GetPollRes
+                {
+                    PollId = poll.PollId,
+                    UserName = _context.Accounts
+                        .Where(u => u.UserId == poll.UserId)
+                        .Select(u => u.Username)
+                        .FirstOrDefault(),
+                    Title = poll.Title,
+                    Description = poll.Description,
+                    StartTime = poll.StartTime,
+                    EndTime = poll.EndTime,
+                    ParticipantCount = _context.Votes.Count(v => v.PollId == poll.PollId)
+                })
+                .ToListAsync();
 
             return new APIResponse<List<GetPollRes>>
             {
                 StatusCode = 200,
                 Message = "OK",
-                Data = res
+                Data = polls
             };
         }
 
@@ -68,7 +71,10 @@ namespace voting_system_core.Service.Impls
             var pollList = polls.Select(p => new GetPollRes
             {
                 PollId = p.PollId,
-                UserId = p.UserId,
+                UserName = _context.Accounts
+                        .Where(u => u.UserId == p.UserId)
+                        .Select(u => u.Username)
+                        .FirstOrDefault(),
                 Title = p.Title,
                 Description = p.Description,
                 StartTime = p.StartTime,
@@ -102,7 +108,10 @@ namespace voting_system_core.Service.Impls
             var pollList = polls.Select(p => new GetPollRes
             {
                 PollId = p.PollId,
-                UserId = p.UserId,
+                UserName = _context.Accounts
+                        .Where(u => u.UserId == p.UserId)
+                        .Select(u => u.Username)
+                        .FirstOrDefault(),
                 Title = p.Title,
                 Description = p.Description,
                 StartTime = p.StartTime,

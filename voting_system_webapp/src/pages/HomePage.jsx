@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import PollCard from "../components/PollCard";
 import { FiSearch, FiMoon, FiSun } from "react-icons/fi";
+import api from "../services/apiService";
+
 
 const HomePage = () => {
   const { darkMode, setDarkMode } = useTheme();
@@ -12,15 +14,22 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPolls = async () => {
       try {
-        const dummyPolls = [
-          { id: 1, title: "Best Programming Language 2024", author: "John Doe", status: "ongoing", startDate: "2024-01-01", endDate: "2024-02-01", participationCount: 1234 },
-          { id: 2, title: "Company Logo Selection", author: "Jane Smith", status: "completed", startDate: "2023-12-01", endDate: "2023-12-31", participationCount: 567 },
-          { id: 3, title: "Annual Employee Satisfaction Survey", author: "Mike Johnson", status: "ongoing", startDate: "2024-01-15", endDate: "2024-02-15", participationCount: 890 },
-        ];
-        setPolls(dummyPolls);
-        setLoading(false);
+        const response = await api.get("/Polls/GetAll");
+        if (response.data && response.data.statusCode === 200) {
+          const realPolls = response.data.data.map((poll) => ({
+            id: poll.pollId,
+            title: poll.title,
+            author: poll.userName,
+            status: poll.isActive ? "ongoing" : "completed",
+            startDate: poll.startTime,
+            endDate: poll.endTime,
+            participationCount: poll.participantCount,
+          }));
+          setPolls(realPolls);
+        }
       } catch (error) {
         console.error("Error fetching polls:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -34,7 +43,7 @@ const HomePage = () => {
       <div className="max-w-7xl mx-auto relative">
         <div className="absolute right-0 top-0 space-x-4 flex items-center">
           <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-full ${darkMode ? "bg-gray-800 text-yellow-300" : "bg-gray-200 text-gray-800"}`}>
-            {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+            {darkMode ? <FiMoon size={20} /> : <FiSun size={20} />}
           </button>
           <button className={`px-4 py-2 ${darkMode ? "text-blue-400" : "text-blue-600"} hover:text-blue-700 font-medium`}>Sign In</button>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">Sign Up</button>

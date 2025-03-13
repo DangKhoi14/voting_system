@@ -15,10 +15,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigin",
-        builder => builder.WithOrigins("http://localhost:3000")
+        policy => policy.WithOrigins("https://localhost:3000")
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
@@ -96,11 +98,18 @@ app.Use(async (context, next) =>
     catch (Exception ex)
     {
         logger.LogError(ex, "An exception occurred while processing the request: {Method} {Path}", context.Request.Method, context.Request.Path);
-        throw;
+
+        context.Response.StatusCode = 500; // Internal Server Error
+        context.Response.ContentType = "application/json";
+
+        var errorResponse = new { message = "Internal Server Error", details = ex.Message };
+        await context.Response.WriteAsJsonAsync(errorResponse);
     }
 });
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
