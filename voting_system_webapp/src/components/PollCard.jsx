@@ -2,7 +2,7 @@ import { useTheme } from "../context/ThemeContext";
 import { FiCalendar, FiUsers } from "react-icons/fi";
 import { format } from "date-fns";
 
-const PollCard = ({ poll }) => {
+const PollCard = ({ poll, onClick }) => {
   const { darkMode } = useTheme();
   const statusColor = poll.status === "ongoing" ? "bg-green-500" : "bg-red-500";
 
@@ -29,7 +29,10 @@ const PollCard = ({ poll }) => {
           <span>{poll.participationCount} participants</span>
         </div>
       </div>
-      <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">View Details</button>
+      <button onClick={() => onClick(poll)}
+        className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+          View Details
+      </button>
     </div>
   );
 };

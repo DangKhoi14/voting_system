@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import PollCard from "../components/PollCard";
+import PollPage from "./PollPage";
 import { FiSearch, FiMoon, FiSun } from "react-icons/fi";
 import api from "../services/apiService";
 
@@ -10,6 +11,7 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPoll, setSelectedPoll] = useState(null);
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -19,6 +21,7 @@ const HomePage = () => {
           const realPolls = response.data.data.map((poll) => ({
             id: poll.pollId,
             title: poll.title,
+            authorid: poll.userId,
             author: poll.userName,
             status: poll.isActive ? "ongoing" : "completed",
             startDate: poll.startTime,
@@ -37,6 +40,10 @@ const HomePage = () => {
   }, []);
 
   const filteredPolls = polls.filter((poll) => poll.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  if (selectedPoll) {
+    return <PollPage poll={selectedPoll} onBack={() => setSelectedPoll(null)} />;
+  }
 
   return (
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
@@ -61,7 +68,7 @@ const HomePage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPolls.map((poll) => (
-              <PollCard key={poll.id} poll={poll} />
+              <PollCard key={poll.id} poll={poll} onClick={setSelectedPoll}/>
             ))}
           </div>
         )}

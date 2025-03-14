@@ -28,6 +28,7 @@ namespace voting_system_core.Service.Impls
                 .Select(poll => new GetPollRes
                 {
                     PollId = poll.PollId,
+                    UserId = poll.UserId,
                     UserName = _context.Accounts
                         .Where(u => u.UserId == poll.UserId)
                         .Select(u => u.Username)
@@ -71,6 +72,7 @@ namespace voting_system_core.Service.Impls
             var pollList = polls.Select(p => new GetPollRes
             {
                 PollId = p.PollId,
+                UserId = p.UserId,
                 UserName = _context.Accounts
                         .Where(u => u.UserId == p.UserId)
                         .Select(u => u.Username)
