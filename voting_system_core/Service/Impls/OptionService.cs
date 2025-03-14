@@ -128,6 +128,23 @@ namespace voting_system_core.Service.Impls
             };
         }
 
+        public async Task<APIResponse<int>> CountVotesOfOption(string optionIdStr)
+        {
+            if (!Ulid.TryParse(optionIdStr, out var optionId))
+                return new APIResponse<int>
+                {
+                    StatusCode = 400,
+                    Message = "Invalid option Id"
+                };
+
+            var votes = await _context.Votes.Where(v => v.OptionId == optionId).ToListAsync();
+            return new APIResponse<int>
+            {
+                StatusCode = 200,
+                Message = "OK",
+                Data = votes.Count
+            };
+        }
 
         public async Task<APIResponse<List<GetOptionsRes>>> GetOptionsByPollId(string pollIdStr)
         {

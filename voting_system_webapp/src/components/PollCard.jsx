@@ -1,10 +1,21 @@
 import { useTheme } from "../context/ThemeContext";
 import { FiCalendar, FiUsers } from "react-icons/fi";
-import { format } from "date-fns";
+import { format, isFuture, isPast } from "date-fns";
 
 const PollCard = ({ poll, onClick }) => {
   const { darkMode } = useTheme();
-  const statusColor = poll.status === "ongoing" ? "bg-green-500" : "bg-red-500";
+  let statusColor, statusText;
+
+  if (isFuture(new Date(poll.startDate))) {
+    statusColor = "bg-yellow-500";
+    statusText = "Upcoming";
+  } else if (isPast(new Date(poll.endDate))) {
+    statusColor = "bg-red-500";
+    statusText = "Completed";
+  } else {
+    statusColor = "bg-green-500";
+    statusText = "Ongoing";
+  }
 
   return (
     <div className={`${darkMode ? "bg-gray-800 text-white" : "bg-white"} rounded-lg shadow-md p-6 transition-transform hover:transform hover:scale-105`}>
@@ -13,7 +24,7 @@ const PollCard = ({ poll, onClick }) => {
           <h3 className={`text-xl font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>{poll.title}</h3>
           <p className={`text-sm ${darkMode ? "text-gray-300" : "text-gray-600"} mt-1`}>By {poll.author}</p>
         </div>
-        <span className={`${statusColor} text-white px-3 py-1 rounded-full text-sm`}>{poll.status}</span>
+        <span className={`${statusColor} text-white px-3 py-1 rounded-full text-sm`}>{statusText}</span>
       </div>
       <div className="space-y-2">
         <div className={`flex items-center ${darkMode ? "text-gray-300" : "text-gray-600"}`}>

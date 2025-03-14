@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import PollCard from "../components/PollCard";
 import PollPage from "./PollPage";
-import { FiSearch, FiMoon, FiSun } from "react-icons/fi";
+import { FiSearch, FiMoon, FiSun, FiPlus } from "react-icons/fi";
 import api from "../services/apiService";
 
 
@@ -59,9 +59,12 @@ const HomePage = () => {
           <h1 className={`text-4xl font-bold ${darkMode ? "text-white" : "text-gray-900"} mb-4`}>Online Voting System</h1>
           <p className={`text-xl ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Participate in active polls or check results</p>
         </div>
-        <div className="relative max-w-xl mx-auto mb-8">
+        <div className="relative max-w-xl mx-auto mb-8 flex items-center">
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input type="text" placeholder="Search polls..." className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <button className="ml-3 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" title="Create New Poll">
+            <FiPlus size={24} />
+          </button>
         </div>
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
