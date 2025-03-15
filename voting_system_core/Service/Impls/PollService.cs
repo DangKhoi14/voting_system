@@ -142,7 +142,7 @@ namespace voting_system_core.Service.Impls
                 };
             }
 
-            var userIdStr = user.FindFirstValue("UserId");
+            var userIdStr = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!Guid.TryParse(userIdStr, out Guid UserId))
             {

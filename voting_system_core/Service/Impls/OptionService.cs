@@ -50,7 +50,7 @@ namespace voting_system_core.Service.Impls
                     Message = "Poll not found"
                 };
 
-            var UserId = Guid.Parse(user.FindFirstValue("UserId"));
+            var UserId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier));
             if (poll.UserId != UserId)
                 return new APIResponse<string>
                 {
@@ -165,6 +165,7 @@ namespace voting_system_core.Service.Impls
                     GetOptionsRes item = new GetOptionsRes();
                     item.OptionId = option.OptionId;
                     item.OptionText = option.OptionText;
+                    item.VoteCount = _context.Votes.Count(v => v.PollId == pollId);
 
                     res.Add(item);
                 }

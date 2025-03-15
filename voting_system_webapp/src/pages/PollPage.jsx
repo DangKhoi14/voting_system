@@ -1,20 +1,45 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiArrowLeft, FiCalendar, FiUsers, FiMoon, FiSun } from "react-icons/fi";
-import { format } from "date-fns";
+import { format, isFuture, isPast } from "date-fns";
 import { useTheme } from "../context/ThemeContext";
+import api from "../services/apiService";
 
 const PollPage = ({ poll, onBack }) => {
     const { darkMode, setDarkMode } = useTheme();
-    
-    const options = [
-      { id: 1, text: "Option 1", votes: 145 },
-      { id: 2, text: "Option 2", votes: 89 },
-      { id: 3, text: "Option 3", votes: 217 },
-      { id: 4, text: "Option 4", votes: 163 }
-    ];
-  
     const [selectedOption, setSelectedOption] = useState(null);
+    const [options, setOptions] = useState([]);
+    
+    let statusColor, statusText;  
+    if (isFuture(new Date(poll.startDate))) {
+      statusColor = "bg-yellow-500";
+      statusText = "Upcoming";
+    } else if (isPast(new Date(poll.endDate))) {
+      statusColor = "bg-red-500";
+      statusText = "Completed";
+    } else {
+      statusColor = "bg-green-500";
+      statusText = "Ongoing";
+    }
+
+    useEffect(() => {
+      const fetchOptions = async () => {
+          try {
+            const response = await api.get("/Options/GetOptionsByPollId?PollId=" + poll.id);
+            if (response.data && response.data.statusCode === 200) {
+              const realOptions = response.data.data.map((option) => ({
+                id: option.optionId,
+                text: option.optionText,
+                votes: option.voteCount,
+              }));
+              setOptions(realOptions);
+            }
+          } catch (error) {
+              console.error("Error fetching poll data:", error);
+          }
+      };
+      fetchOptions();
+    }, [poll.id]);
   
     return (
       <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
@@ -42,9 +67,7 @@ const PollPage = ({ poll, onBack }) => {
                 <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>Poll ID: {poll.id}</p>
                 <p className={`${darkMode ? "text-gray-300" : "text-gray-600"}`}>Created by: {poll.author} (User ID: {poll.authorid})</p>
               </div>
-              <span className={`${poll.status === "ongoing" ? "bg-green-500" : "bg-red-500"} text-white px-4 py-2 rounded-full`}>
-                {poll.status}
-              </span>
+              <span className={`${statusColor} text-white px-3 py-1 rounded-full text-sm`}>{statusText}</span>
             </div>
             
             <div className={`${darkMode ? "text-gray-300" : "text-gray-700"} mb-8`}>

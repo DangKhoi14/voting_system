@@ -5,5 +5,7 @@
         public Ulid OptionId { get; set; }
 
         public string OptionText { get; set; }
+
+        public int VoteCount { get; set; }
     }
 }
