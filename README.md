@@ -46,16 +46,19 @@ A web application that allows users to create and participate in polls. Built wi
    ```
 #### - Frontend
 1. Navigate to the frontend directory:
-   '''sh
-   cd ../voting_system_webapp
-   '''
-2. Install dependencies:
-   '''sh
+   (Open another cmd window)
+   ```sh
+   cd voting_system/voting_system_webapp
+   ```
+3. Install dependencies:
+   ```sh
    npm install
-   '''
-3. Start the development server:
+   ```
+4. Start the development server:
+   ```sh
    npm start
-
+   ```
+   
 ## Contributing
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
 
