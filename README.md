@@ -30,19 +30,31 @@ A web application that allows users to create and participate in polls. Built wi
 - PostgreSQL database set up in Supabase
 
 ### Installation
+#### - Backend
 1. Clone the repository:
    ```sh
    git clone https://github.com/DangKhoi14/voting_system.git
    ```
 2. Navigate to the project directory:
    ```sh
-   cd voting_system
+   cd voting_system/voting_system_core
    ```
 3. Configure Supabase connection in `appsettings.json`
 4. Run the application:
    ```sh
    dotnet run
    ```
+#### - Frontend
+1. Navigate to the frontend directory:
+   '''sh
+   cd ../voting_system_webapp
+   '''
+2. Install dependencies:
+   '''sh
+   npm install
+   '''
+3. Start the development server:
+   npm start
 
 ## Contributing
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
