@@ -165,7 +165,7 @@ namespace voting_system_core.Service.Impls
                     GetOptionsRes item = new GetOptionsRes();
                     item.OptionId = option.OptionId;
                     item.OptionText = option.OptionText;
-                    item.VoteCount = _context.Votes.Count(v => v.PollId == pollId);
+                    item.VoteCount = _context.Votes.Count(v => v.OptionId == option.OptionId);
 
                     res.Add(item);
                 }
