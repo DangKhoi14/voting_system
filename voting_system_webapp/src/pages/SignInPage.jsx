@@ -1,9 +1,44 @@
+import { useState } from "react";
 import { FiArrowLeft, FiMail, FiLock } from "react-icons/fi";
 import { useTheme } from "../context/ThemeContext";
-
+import api from "../services/apiService";
 
 const SignInPage = ({ onBack, onSignUp }) => {
     const { darkMode } = useTheme();
+    const [formData, setFormData] = useState({ emailorusername: "", password: "" });
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(""); // ✅ Thêm state hiển thị thông báo thành công
+    const [loading, setLoading] = useState(false);
+    
+    const handleChange = (e) => {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setError("");
+      setSuccess(""); // Thêm state để hiển thị thông báo thành công
+      setLoading(true);
+
+      try {
+        const response = await api.post("accounts/login", {
+          emailorusername: formData.emailorusername,
+          password: formData.password,
+        });
+
+        if (response.status === 200) {
+          localStorage.setItem("token", response.data.accessToken);
+          localStorage.setItem("refreshToken", response.data.refreshToken);
+          setSuccess("Sign-in successful! 🎉");
+        } else {
+          setError(response.data.message || "Sign-in failed.");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Sign-in failed.");
+      } finally {
+        setLoading(false);
+      }
+    }
 
     return (
       <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>

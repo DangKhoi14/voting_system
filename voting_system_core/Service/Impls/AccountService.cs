@@ -100,42 +100,39 @@ namespace voting_system_core.Service.Impls
         {
             try
             {
-                var users = GetAll();
-                foreach (var user in users.Result.Data)
+                var existingUser = await _context.Accounts.FirstOrDefaultAsync(u => u.Username == req.Username);
+                if (existingUser != null)
                 {
-                    if (user.Username == req.Username)
+                    return new APIResponse<string>
                     {
-                        return new APIResponse<string>
-                        {
-                            StatusCode = 200,
-                            Message = "Username already exists"
-                        };
-                    }
+                        StatusCode = 409, // Conflict
+                        Message = "Username already exists"
+                    };
                 }
 
-                var newAcc = new Account();
-
-                newAcc.Username = req.Username;
-                newAcc.Email = req.Email;
-                newAcc.FirstEmail = req.Email;
-                var passwordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
-                newAcc.Password = passwordHash;
-                newAcc.CreateAt = DateOnly.FromDateTime(DateTime.Now);
-                newAcc.LastLogin = DateTime.UtcNow;
-                newAcc.Role = 2;
+                var newAcc = new Account
+                {
+                    Username = req.Username,
+                    Email = req.Email,
+                    FirstEmail = req.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(req.Password),
+                    CreateAt = DateOnly.FromDateTime(DateTime.Now),
+                    LastLogin = DateTime.UtcNow,
+                    Role = 2
+                };
 
                 _context.Accounts.Add(newAcc);
-
                 await _context.SaveChangesAsync();
+
                 return new APIResponse<string>
                 {
-                    StatusCode = 200,
+                    StatusCode = 201, // Created
                     Message = "Success"
                 };
             }
             catch (Exception ex)
             {
-                return new APIResponse<string>()
+                return new APIResponse<string>
                 {
                     StatusCode = 500,
                     Message = ex.Message
