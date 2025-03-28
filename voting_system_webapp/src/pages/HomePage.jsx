@@ -17,6 +17,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPoll, setSelectedPoll] = useState(null);
   const [page, setPage] = useState("home");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -42,7 +43,20 @@ const HomePage = () => {
         setLoading(false);
       }
     };
+
+    const fetchUser = async () => {
+      try {
+        const response = await api.get("/accounts/me");
+        if (response.data && response.data.statusCode === 200) {
+          setUser(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
     fetchPolls();
+    fetchUser();
   }, []);
 
   const filteredPolls = polls.filter((poll) => poll.title.toLowerCase().includes(searchTerm.toLowerCase()));

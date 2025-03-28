@@ -24,7 +24,7 @@ namespace voting_system_core.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetInfo()
+        public async Task<IActionResult> Me()
         {
             var res = await _accountService.GetAccountInfo();
             return Ok(res);
