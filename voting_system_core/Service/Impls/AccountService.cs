@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Security.Claims;
 using voting_system_core.Models;
 using voting_system_core.Data;
 using voting_system_core.DTOs.Requests.Account;
@@ -15,11 +16,13 @@ namespace voting_system_core.Service.Impls
     {
         private readonly VotingDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountService(VotingDbContext context, IConfiguration configuration)
+        public AccountService(VotingDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<APIResponse<List<GetAccountRes>>> GetAll()
@@ -51,49 +54,52 @@ namespace voting_system_core.Service.Impls
             }
         }
 
-        public async Task<APIResponse<GetAccountInfoRes>> GetAccountInfo(string UsernameOrEmail)
+        public async Task<APIResponse<GetAccountInfoRes>> GetAccountInfo()
         {
-            try
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirstValue("UserId");
+
+            if (!Guid.TryParse(userIdClaim, out var UserId))
             {
-                var account = await _context.Accounts
-                    .Where(x => 
-                        x.Username == UsernameOrEmail || 
-                        x.Email == UsernameOrEmail)
-                    .FirstOrDefaultAsync();
-
-                if (account == null)
-                {
-                    return new APIResponse<GetAccountInfoRes>()
-                    {
-                        StatusCode = 404,
-                        Message = "Account does not exist",
-                    };
-                }
-
-                var res = new GetAccountInfoRes();
-                res.Username = account.Username;
-                res.Email = account.Email;
-                res.IsEmailVerified = account.IsEmailVerified;
-                res.Role = account.Role;
-                res.CreateAt = account.CreateAt;
-                res.LastLogin = account.LastLogin;
-                res.ProfilePictureUrl = account.ProfilePictureUrl;
-
                 return new APIResponse<GetAccountInfoRes>
                 {
-                    StatusCode = 200,
-                    Message = "OK",
-                    Data = res
+                    StatusCode = 401,
+                    Message = "Unauthorized"
                 };
             }
-            catch (Exception ex)
+
+            var account = await _context.Accounts
+                .Where(x => x.UserId == UserId)
+                .FirstOrDefaultAsync();
+
+            var pollIds = await _context.Polls
+                .Where(x => x.UserId == account.UserId)
+                .Select(x => x.PollId) // Lấy danh sách PollId do user tạo
+                .ToListAsync();
+
+            var participationCount = await _context.Votes
+                .Where(v => pollIds.Contains(v.PollId))
+                .CountAsync(); // Đếm tổng số vote của tất cả các poll
+
+            var res = new GetAccountInfoRes
             {
-                return new APIResponse<GetAccountInfoRes>()
-                {
-                    StatusCode = 500,
-                    Message = ex.Message,
-                };
-            }
+                Username = account.Username,
+                Email = account.Email,
+                IsEmailVerified = account.IsEmailVerified,
+                Role = account.Role,
+                CreateAt = account.CreateAt,
+                LastLogin = account.LastLogin,
+                ProfilePictureUrl = account.ProfilePictureUrl,
+                Bio = account.Bio,
+                Polls = pollIds.Count,
+                Participations = participationCount
+            };
+
+            return new APIResponse<GetAccountInfoRes>
+            {
+                StatusCode = 200,
+                Message = "OK",
+                Data = res
+            };
         }
 
         public async Task<APIResponse<string>> Create(CreateAccountReq req)

@@ -38,6 +38,8 @@ namespace voting_system_core.Models
 
         public bool IsDeleted { get; set; }
 
+        public string? Bio { get; set; }
+
         public string? ProfilePictureUrl { get; set; }
 
         public string? ResetPasswordToken { get; set; }

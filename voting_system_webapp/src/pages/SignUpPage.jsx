@@ -35,6 +35,17 @@ const SignUpPage = ({ onBack, onSignIn }) => {
   
           if (response.status === 201 || response.status === 200) {
               setSuccess("Account created successfully! 🎉");
+
+              const loginResponse = await api.post("accounts/login", {
+                  emailorusername: formData.email,
+                  password: formData.password,
+              });
+
+              if (loginResponse.status === 200) {
+                localStorage.setItem("token", loginResponse.data.accessToken);
+                localStorage.setItem("refreshToken", loginResponse.data.refreshToken);
+                setSuccess("Sign-in successful! 🎉");
+              }
           } else {
               setError(response.data.message || "Sign-up failed.");
           }

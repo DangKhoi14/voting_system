@@ -8,7 +8,7 @@ namespace voting_system_core.Service.Interface
     public interface IAccountService
     {
         Task<APIResponse<List<GetAccountRes>>> GetAll();
-        Task<APIResponse<GetAccountInfoRes>> GetAccountInfo(string UsernameOrEmail);
+        Task<APIResponse<GetAccountInfoRes>> GetAccountInfo();
         Task<APIResponse<LoginRes>> Login(LoginReq loginReq);
         Task<APIResponse<string>> Create(CreateAccountReq createReq);
         Task<APIResponse<string>> ChangeUsername(ChangeUsernameReq req, string Username);
