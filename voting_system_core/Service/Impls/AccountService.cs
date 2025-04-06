@@ -73,12 +73,12 @@ namespace voting_system_core.Service.Impls
 
             var pollIds = await _context.Polls
                 .Where(x => x.UserId == account.UserId)
-                .Select(x => x.PollId) // Lấy danh sách PollId do user tạo
+                .Select(x => x.PollId)
                 .ToListAsync();
 
             var participationCount = await _context.Votes
                 .Where(v => pollIds.Contains(v.PollId))
-                .CountAsync(); // Đếm tổng số vote của tất cả các poll
+                .CountAsync();
 
             var res = new GetAccountInfoRes
             {
@@ -154,22 +154,31 @@ namespace voting_system_core.Service.Impls
                 {
                     return new APIResponse<LoginRes>
                     {
-                        StatusCode = 400,
+                        StatusCode = 401,
                         Message = "Invalid credentials"
                     };
                 }
-
+                
                 // Fetch user only by Username or Email
                 var user = _context.Accounts.FirstOrDefault(x =>
                     x.Username == loginReq.UserNameOrEmail ||
                     x.Email == loginReq.UserNameOrEmail);
+
+                if (user == null)
+                {
+                    return new APIResponse<LoginRes>
+                    {
+                        StatusCode = 401,
+                        Message = "Invalid credentials"
+                    };
+                }
 
                 // Check if user is deleted
                 if (user.IsDeleted)
                 {
                     return new APIResponse<LoginRes>
                     {
-                        StatusCode = 400,
+                        StatusCode = 401,
                         Message = "Invalid credentials"
                     };
                 }
