@@ -17,7 +17,7 @@ const SignUpPage = ({ onBack, onSignIn }) => {
     const handleSubmit = async (e) => {
       e.preventDefault();
       setError(""); 
-      setSuccess(""); // Thêm state để hiển thị thông báo thành công
+      setSuccess("");
       setLoading(true);
   
       if (formData.password !== formData.confirmPassword) {

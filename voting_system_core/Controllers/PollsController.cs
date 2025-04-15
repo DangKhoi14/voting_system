@@ -32,6 +32,12 @@ namespace voting_system_core.Controllers
             return Ok(await _pollService.GetByTitle(title));
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetPollById(string pollId)
+        {
+            return Ok(await _pollService.GetPollById(pollId));
+        }
+
 
         //[Authorize]
         [HttpGet("[action]")]

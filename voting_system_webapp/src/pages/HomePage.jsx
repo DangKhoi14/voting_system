@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 import PollCard from "../components/PollCard";
-import PollPage from "./PollPage";
-import SignInPage from "./SignInPage";
-import SignUpPage from "./SignUpPage";
-import CreatePollPage from "./CreatePollPage";
 import { FiSearch, FiMoon, FiSun, FiPlus } from "react-icons/fi";
 import api from "../services/apiService";
 import Icon from "../assets/logo.svg";
@@ -15,9 +12,8 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPoll, setSelectedPoll] = useState(null);
-  const [page, setPage] = useState("home");
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -61,21 +57,9 @@ const HomePage = () => {
 
   const filteredPolls = polls.filter((poll) => poll.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  if (page === "signin") {
-    return <SignInPage onBack={() => setPage("home")} onSignUp={() => setPage("signup")} />;
-  }
-
-  if (page === "signup") {
-    return <SignUpPage onBack={() => setPage("home")} onSignIn={() => setPage("signin")} />;
-  }
-
-  if (page === "create") {
-    return <CreatePollPage onBack={() => setPage("home")} />;
-  }
-
-  if (selectedPoll) {
-    return <PollPage poll={selectedPoll} onBack={() => setSelectedPoll(null)} />;
-  }
+  const handleViewDetail = (id) => {
+    navigate(`/poll/${id}`);
+  };
 
   return (
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
@@ -91,13 +75,13 @@ const HomePage = () => {
             {darkMode ? <FiMoon size={20} /> : <FiSun size={20} />}
           </button>
           <button 
-            onClick={() => setPage("signin")} 
+            onClick={() => navigate("/signin")}
             className={`px-4 py-2 ${darkMode ? "text-blue-400" : "text-blue-600"} hover:text-blue-700 font-medium`}
           >
             Sign In
           </button>
           <button 
-            onClick={() => setPage("signup")} 
+            onClick={() => navigate("/signup")} 
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
           >
             Sign Up
@@ -121,7 +105,7 @@ const HomePage = () => {
           <input type="text" placeholder="Search polls..." className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           <button className="ml-3 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" 
                   title="Create New Poll"
-                  onClick={() => setPage("create")}>
+                  onClick={() => navigate("/createpoll")}>
             <FiPlus size={24} />
           </button>
         </div>
@@ -132,7 +116,7 @@ const HomePage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPolls.map((poll) => (
-              <PollCard key={poll.id} poll={poll} onClick={setSelectedPoll}/>
+              <PollCard key={poll.id} poll={poll} onClick={handleViewDetail}/>
             ))}
           </div>
         )}

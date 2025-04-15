@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // 👈 cần import
 import { FiArrowLeft, FiMail, FiLock } from "react-icons/fi";
 import { useTheme } from "../context/ThemeContext";
@@ -12,15 +12,13 @@ const SignInPage = ({ onBack, onSignUp }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // dùng để chuyển trang
 
-  useEffect(() => {
-    if (success) {
-      navigate("/home"); // chỉ điều hướng nếu đăng nhập thành công
-    }
-  }, [success, navigate]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const onBackHome = () => {
+    navigate("/");
   };
 
   const handleSubmit = async (e) => {
@@ -39,6 +37,7 @@ const SignInPage = ({ onBack, onSignUp }) => {
         localStorage.setItem("token", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
         setSuccess("Sign-in successful! 🎉");
+        setTimeout(() => navigate("/"), 1500);
       } else {
         setError(response.data.message || "Sign-in failed.");
       }
@@ -53,7 +52,7 @@ const SignInPage = ({ onBack, onSignUp }) => {
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
       <div className="max-w-md mx-auto">
         <button
-          onClick={onBack}
+          onClick={onBackHome}
           className={`flex items-center ${darkMode ? "text-white" : "text-gray-800"} mb-6 hover:opacity-80`}
         >
           <FiArrowLeft className="mr-2" /> Back to Home

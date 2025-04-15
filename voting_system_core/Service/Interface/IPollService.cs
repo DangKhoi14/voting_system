@@ -11,5 +11,6 @@ namespace voting_system_core.Service.Interface
         Task<APIResponse<List<GetPollRes>>> GetAll();
         Task<APIResponse<string>> CreatePoll(CreatePollReq req);
         Task<APIResponse<string>> DeletePoll(DeletePollReq req);
+        Task<APIResponse<GetPollRes>> GetPollById(string pollId);
     }
 }

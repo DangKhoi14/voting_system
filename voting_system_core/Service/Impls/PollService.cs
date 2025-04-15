@@ -91,6 +91,41 @@ namespace voting_system_core.Service.Impls
             };
         }
 
+        public async Task<APIResponse<GetPollRes>> GetPollById(string pollId)
+        {
+            var poll = await _context.Polls
+                .Where(x => x.PollId == Ulid.Parse(pollId))
+                .Select(p => new GetPollRes
+                {
+                    PollId = p.PollId,
+                    UserId = p.UserId,
+                    UserName = _context.Accounts
+                        .Where(u => u.UserId == p.UserId)
+                        .Select(u => u.Username)
+                        .FirstOrDefault(),
+                    Title = p.Title,
+                    Description = p.Description,
+                    StartTime = p.StartTime,
+                    EndTime = p.EndTime
+                })
+                .FirstOrDefaultAsync();
+
+            if (poll == null)
+            {
+                return new APIResponse<GetPollRes>
+                {
+                    StatusCode = 404,
+                    Message = "Poll not found"
+                };
+            }
+
+            return new APIResponse<GetPollRes>
+            {
+                StatusCode = 200,
+                Message = "OK",
+                Data = poll
+            };
+        }
 
         public async Task<APIResponse<List<GetPollRes>>> GetByTitle(string title)
         {
@@ -110,6 +145,7 @@ namespace voting_system_core.Service.Impls
             var pollList = polls.Select(p => new GetPollRes
             {
                 PollId = p.PollId,
+                UserId = p.UserId,
                 UserName = _context.Accounts
                         .Where(u => u.UserId == p.UserId)
                         .Select(u => u.Username)

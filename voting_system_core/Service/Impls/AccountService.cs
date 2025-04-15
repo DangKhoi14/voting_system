@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System.Security.Claims;
 using voting_system_core.Models;
 using voting_system_core.Data;

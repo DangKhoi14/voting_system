@@ -1,15 +1,75 @@
-
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiCalendar, FiUsers, FiMoon, FiSun } from "react-icons/fi";
 import { format, isFuture, isPast } from "date-fns";
 import { useTheme } from "../context/ThemeContext";
 import api from "../services/apiService";
 
-const PollPage = ({ poll, onBack }) => {
+const PollPage = () => {
+    const { id } = useParams();
+    const [poll, setPoll] = useState(null);
+    const [loading, setLoading] = useState(true);
     const { darkMode, setDarkMode } = useTheme();
     const [selectedOption, setSelectedOption] = useState(null);
     const [options, setOptions] = useState([]);
+    const navigate = useNavigate();
     
+    const onBackHome = () => {
+      navigate("/");
+    };
+
+    useEffect(() => {
+      const fetchPoll = async () => {
+        try {
+          const response = await api.get("/Polls/GetPollById?pollId=" + id);
+          if (response.data.statusCode === 200) {
+            const poll = response.data.data;
+            const realPoll = {
+              id: poll.pollId,
+              title: poll.title,
+              description: poll.description,
+              authorid: poll.userId,
+              author: poll.userName,
+              status: poll.isActive,
+              startDate: poll.startTime,
+              endDate: poll.endTime,
+              participationCount: poll.participantCount,
+            };
+            setPoll(realPoll);
+          }
+        } catch (error) {
+          console.error("Error fetching poll:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchPoll();
+    },[id]);
+
+    useEffect(() => {
+      const fetchOptions = async () => {
+        if (!poll) return;
+        try {
+          const response = await api.get("/Options/GetOptionsByPollId?PollId=" + poll.id);
+          
+          if (response.data && response.data.statusCode === 200) {
+            const realOptions = response.data.data.map((option) => ({
+              id: option.optionId,
+              text: option.optionText,
+              votes: option.voteCount,
+            }));
+            setOptions(realOptions);
+          }
+        } catch (error) {
+            console.error("Error fetching poll data:", error);
+        }
+      };
+      fetchOptions();
+    }, [poll]);
+    if (loading) return <p>Loading...</p>;
+    if (!poll) return <p>Poll not found</p>;
+
     let statusColor, statusText;  
     if (isFuture(new Date(poll.startDate))) {
       statusColor = "bg-yellow-500";
@@ -22,25 +82,6 @@ const PollPage = ({ poll, onBack }) => {
       statusText = "Ongoing";
     }
 
-    useEffect(() => {
-      const fetchOptions = async () => {
-          try {
-            const response = await api.get("/Options/GetOptionsByPollId?PollId=" + poll.id);
-            if (response.data && response.data.statusCode === 200) {
-              const realOptions = response.data.data.map((option) => ({
-                id: option.optionId,
-                text: option.optionText,
-                votes: option.voteCount,
-              }));
-              setOptions(realOptions);
-            }
-          } catch (error) {
-              console.error("Error fetching poll data:", error);
-          }
-      };
-      fetchOptions();
-    }, [poll.id]);
-  
     return (
       <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
         <div className="max-w-7xl mx-auto relative">
@@ -55,7 +96,7 @@ const PollPage = ({ poll, onBack }) => {
 
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={onBack}
+            onClick={onBackHome}
             className={`flex items-center ${darkMode ? "text-white" : "text-gray-800"} mb-6 hover:opacity-80`}
           >
             <FiArrowLeft className="mr-2" /> Back to Polls
@@ -74,7 +115,7 @@ const PollPage = ({ poll, onBack }) => {
               <h2 className={`text-xl font-semibold ${darkMode ? "text-white" : "text-gray-900"} mb-3`}>Description</h2>
               <p>{poll.description || "No description provided."}</p>
             </div>
-  
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className={`${darkMode ? "bg-gray-700" : "bg-gray-50"} p-4 rounded-lg`}>
                 <h3 className={`text-lg font-semibold ${darkMode ? "text-white" : "text-gray-900"} mb-2`}>Timeline</h3>

@@ -40,7 +40,7 @@ const PollCard = ({ poll, onClick }) => {
           <span>{poll.participationCount} participants</span>
         </div>
       </div>
-      <button onClick={() => onClick(poll)}
+      <button onClick={() => onClick(poll.id)}
         className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
           View Details
       </button>
