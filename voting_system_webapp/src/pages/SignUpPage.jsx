@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiUser, FiMail, FiLock } from "react-icons/fi";
 import { useTheme } from "../context/ThemeContext";
 import api from "../services/apiService";
@@ -9,6 +10,7 @@ const SignUpPage = ({ onBack, onSignIn }) => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(""); // ✅ Thêm state hiển thị thông báo thành công
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,15 +38,16 @@ const SignUpPage = ({ onBack, onSignIn }) => {
           if (response.status === 201 || response.status === 200) {
               setSuccess("Account created successfully! 🎉");
 
-              const loginResponse = await api.post("accounts/login", {
-                  emailorusername: formData.email,
-                  password: formData.password,
+              const loginResponse = await api.post("Accounts/Login", {
+                usernameoremail: formData.email,
+                password: formData.password,
               });
 
               if (loginResponse.status === 200) {
                 localStorage.setItem("token", loginResponse.data.accessToken);
                 localStorage.setItem("refreshToken", loginResponse.data.refreshToken);
                 setSuccess("Sign-in successful! 🎉");
+                setTimeout(() => navigate("/"), 1500);
               }
           } else {
               setError(response.data.message || "Sign-up failed.");
