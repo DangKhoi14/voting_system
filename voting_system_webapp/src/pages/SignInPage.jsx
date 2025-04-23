@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 👈 cần import
+import { useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiMail, FiLock } from "react-icons/fi";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../contexts/ThemeContext";
 import api from "../services/apiService";
 
-const SignInPage = ({ onBack, onSignUp }) => {
+
+const SignInPage = ({ onSignUp }) => {
   const { darkMode } = useTheme();
   const [formData, setFormData] = useState({ usernameoremail: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setUser, setChecked } = useContext(UserContext);
   const navigate = useNavigate(); // dùng để chuyển trang
 
   const handleChange = (e) => {
@@ -28,14 +32,21 @@ const SignInPage = ({ onBack, onSignUp }) => {
     setLoading(true);
 
     try {
-      const response = await api.post("Accounts/Login", {
+      const response = await api.post("/Accounts/Login", {
         usernameoremail: formData.usernameoremail,
         password: formData.password,
       });
 
       if (response.data.statusCode === 200) {
-        localStorage.setItem("token", response.data.accessToken);
-        localStorage.setItem("refreshToken", response.data.refreshToken);
+        localStorage.setItem("accessToken", response.data.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.data.refreshToken);
+
+        // Gọi lại API /accounts/me để lấy thông tin user
+        const me = await api.get("/Accounts/Me");
+        setUser(me.data); 
+        setChecked(true); 
+        localStorage.setItem("user", JSON.stringify(me.data));
+
         setSuccess("Sign-in successful! 🎉");
         setTimeout(() => navigate("/"), 1500);
       } else {

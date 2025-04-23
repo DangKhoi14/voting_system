@@ -1,4 +1,4 @@
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../contexts/ThemeContext";
 import { FiCalendar, FiUsers } from "react-icons/fi";
 import { format, isFuture, isPast } from "date-fns";
 
@@ -42,7 +42,7 @@ const PollCard = ({ poll, onClick }) => {
       </div>
       <button onClick={() => onClick(poll.id)}
         className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
-          View Details
+        View Details
       </button>
     </div>
   );

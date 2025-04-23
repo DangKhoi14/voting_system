@@ -2,11 +2,17 @@ import { useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { FiSun, FiMoon } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import Icon from "../assets/icon.png";
+import defaultAvatar from "../assets/default-avatar.jpg";
 
 const Header = ({ darkMode, setDarkMode }) => {
-  const { user, checked } = useContext(UserContext);
+  // const context = useContext(UserContext);
+  // const user = context?.user ?? null;
+  // const checked = context?.checked ?? false;
+  const { user = null, checked = false } = useContext(UserContext) || {};
   const navigate = useNavigate();
+
+  const getAvatarUrl = () =>
+    user?.profilePictureUrl || defaultAvatar;
 
   return (
     <div className="absolute right-0 top-0 space-x-4 flex items-center">
@@ -14,9 +20,13 @@ const Header = ({ darkMode, setDarkMode }) => {
         {darkMode ? <FiMoon size={20} /> : <FiSun size={20} />}
       </button>
 
-      {checked && user ? (
+      {checked ? (
         <img
-          src={user.avatarUrl || "/default-avatar.png"}
+          src={getAvatarUrl()}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = defaultAvatar;
+          }} // Fallback to default avatar if the image fails to load
           alt="avatar"
           className="w-8 h-8 rounded-full cursor-pointer"
           onClick={() => navigate("/profile")}

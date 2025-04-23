@@ -10,10 +10,14 @@ const api = axios.create({
 // Interceptor: Thêm token vào request nếu có
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      // console.log("✅ Gửi request với token:", token);
     }
+    // else {
+    //   console.log("⛔ Không tìm thấy token");
+    // }
     return config;
   },
   (error) => Promise.reject(error)
@@ -30,11 +34,11 @@ const refreshToken = async () => {
     });
 
     // Lưu token mới
-    localStorage.setItem("token", response.data.accessToken);
+    localStorage.setItem("accessToken", response.data.accessToken);
     return response.data.accessToken;
   } catch (error) {
     console.error("Failed to refresh token", error);
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     return null;
   }

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiUser, FiMail, FiLock } from "react-icons/fi";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../contexts/ThemeContext";
 import api from "../services/apiService";
 
-const SignUpPage = ({ onBack, onSignIn }) => {
+const SignUpPage = ({ onSignIn }) => {
     const { darkMode } = useTheme();
     const [formData, setFormData] = useState({ username: "", email: "", password: "", confirmPassword: "" });
     const [error, setError] = useState("");
@@ -16,58 +16,62 @@ const SignUpPage = ({ onBack, onSignIn }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const onBackHome = () => {
+        navigate("/");
+    };
+
     const handleSubmit = async (e) => {
-      e.preventDefault();
-      setError(""); 
-      setSuccess("");
-      setLoading(true);
-  
-      if (formData.password !== formData.confirmPassword) {
-          setError("Passwords do not match.");
-          setLoading(false);
-          return;
-      }
-  
-      try {
-          const response = await api.post("accounts/create", {
-              username: formData.username,
-              email: formData.email,
-              password: formData.password,
-          });
-  
-          if (response.status === 201 || response.status === 200) {
-              setSuccess("Account created successfully! 🎉");
+        e.preventDefault();
+        setError("");
+        setSuccess("");
+        setLoading(true);
 
-              const loginResponse = await api.post("Accounts/Login", {
-                usernameoremail: formData.email,
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await api.post("/Accounts/Create", {
+                username: formData.username,
+                email: formData.email,
                 password: formData.password,
-              });
+            });
 
-              if (loginResponse.status === 200) {
-                localStorage.setItem("token", loginResponse.data.accessToken);
-                localStorage.setItem("refreshToken", loginResponse.data.refreshToken);
-                setSuccess("Sign-in successful! 🎉");
-                setTimeout(() => navigate("/"), 1500);
-              }
-          } else {
-              setError(response.data.message || "Sign-up failed.");
-          }
-      } catch (err) {
-          if (err.response?.status === 409) {
-              setError("Username already exists.");
-          } else {
-              setError(err.response?.data?.message || "Sign-up failed.");
-          }
-      } finally {
-          setLoading(false);
-      }
+            if (response.status === 201 || response.status === 200) {
+                setSuccess("Account created successfully! 🎉");
+
+                const loginResponse = await api.post("/Accounts/Login", {
+                    usernameoremail: formData.email,
+                    password: formData.password,
+                });
+
+                if (loginResponse.status === 200) {
+                    localStorage.setItem("taccessToken", loginResponse.data.data.accessToken);
+                    localStorage.setItem("refreshToken", loginResponse.data.data.refreshToken);
+                    setSuccess("Sign-in successful! 🎉");
+                    setTimeout(() => navigate("/"), 1500);
+                }
+            } else {
+                setError(response.data.message || "Sign-up failed.");
+            }
+        } catch (err) {
+            if (err.response?.status === 409) {
+                setError("Username already exists.");
+            } else {
+                setError(err.response?.data?.message || "Sign-up failed.");
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
             <div className="max-w-md mx-auto">
                 <button
-                    onClick={onBack}
+                    onClick={onBackHome}
                     className={`flex items-center ${darkMode ? "text-white" : "text-gray-800"} mb-6 hover:opacity-80`}
                 >
                     <FiArrowLeft className="mr-2" /> Back to Home
