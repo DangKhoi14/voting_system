@@ -20,7 +20,7 @@ const Header = ({ darkMode, setDarkMode }) => {
         {darkMode ? <FiMoon size={20} /> : <FiSun size={20} />}
       </button>
 
-      {checked ? (
+      {!checked ? null : user ? (
         <img
           src={getAvatarUrl()}
           onError={(e) => {
@@ -28,16 +28,18 @@ const Header = ({ darkMode, setDarkMode }) => {
             e.target.src = defaultAvatar;
           }} // Fallback to default avatar if the image fails to load
           alt="avatar"
-          className="w-8 h-8 rounded-full cursor-pointer"
+          className="w-9 h-9 rounded-full cursor-pointer"
           onClick={() => navigate("/profile")}
         />
       ) : (
         <>
-          <button onClick={() => navigate("/signin")} className={`px-4 py-2 ${darkMode ? "text-blue-400" : "text-blue-600"} hover:text-blue-700 font-medium`}>
-            Sign In
+          <button onClick={() => navigate("/signin")} 
+            className={`px-4 py-2 ${darkMode ? "text-blue-400" : "text-blue-600"} hover:text-blue-700 font-medium`}>
+              Sign In
           </button>
-          <button onClick={() => navigate("/signup")} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
-            Sign Up
+          <button onClick={() => navigate("/signup")} 
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+              Sign Up
           </button>
         </>
       )}

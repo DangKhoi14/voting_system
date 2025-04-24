@@ -3,6 +3,7 @@ import { UserContext } from "../contexts/UserContext";
 import { FiArrowLeft, FiMail, FiEdit, FiPhone } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useEffect } from "react";
 
 const ProfilePage = () => {
   const { darkMode } = useTheme();
@@ -15,13 +16,26 @@ const ProfilePage = () => {
   };
 
   const [profile, setProfile] = useState({
-    name: user?.name || "Unknown User",
-    email: user?.email || "No email",
-    phone: user?.phone || "No phone",
-    bio: user?.bio || "No bio available",
-    polls: user?.polls || 0,
-    participations: user?.participations || 0
+    name: "Unknown User",
+    email: "No email",
+    phone: "No phone",
+    bio: "No bio available",
+    polls: 0,
+    participations: 0
   });
+
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        name: user.username || "Unknown User",
+        email: user.email || "No email",
+        phone: user.phone || "No phone",
+        bio: user.bio || "No bio available",
+        polls: user.polls || 0,
+        participations: user.participations || 0
+      });
+    }
+  }, [user]);
 
   return (
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { FiArrowLeft } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const CreatePollPage = ({ onBack }) => {
   const { darkMode } = useTheme();
+  const navigate = useNavigate();
 
   const [pollData, setPollData] = useState({
     title: "",
@@ -11,6 +13,10 @@ const CreatePollPage = ({ onBack }) => {
     startDate: "",
     endDate: ""
   });
+
+  const onBackHome = () => {
+    navigate("/");
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,7 +28,7 @@ const CreatePollPage = ({ onBack }) => {
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} py-8 px-4 sm:px-6 lg:px-8`}>
       <div className="max-w-4xl mx-auto">
         <button
-          onClick={onBack}
+          onClick={onBackHome}
           className={`flex items-center ${darkMode ? "text-white" : "text-gray-800"} mb-6 hover:opacity-80`}
         >
           <FiArrowLeft className="mr-2" /> Back to Polls

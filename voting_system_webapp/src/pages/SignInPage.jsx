@@ -7,14 +7,18 @@ import { useTheme } from "../contexts/ThemeContext";
 import api from "../services/apiService";
 
 
+import { UserProvider } from "../contexts/UserContext";
 const SignInPage = ({ onSignUp }) => {
   const { darkMode } = useTheme();
   const [formData, setFormData] = useState({ usernameoremail: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const { setUser, setChecked } = useContext(UserContext);
-  const navigate = useNavigate(); // dùng để chuyển trang
+  const navigate = useNavigate();
+
+  const { refreshUser } = useContext(UserContext);
+  const {fetchUser} = useContext(UserContext);
+  const { setUser, setChecked } = useContext(UserContext) || {}; 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +29,8 @@ const SignInPage = ({ onSignUp }) => {
     navigate("/");
   };
 
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -37,18 +43,23 @@ const SignInPage = ({ onSignUp }) => {
         password: formData.password,
       });
 
+
+      
       if (response.data.statusCode === 200) {
         localStorage.setItem("accessToken", response.data.data.accessToken);
         localStorage.setItem("refreshToken", response.data.data.refreshToken);
 
-        // Gọi lại API /accounts/me để lấy thông tin user
         const me = await api.get("/Accounts/Me");
-        setUser(me.data); 
+        setUser(me.data.data); 
         setChecked(true); 
-        localStorage.setItem("user", JSON.stringify(me.data));
+        localStorage.setItem("user", JSON.stringify(me.data.data));
+        console.log("User data:", me.data.data);
+
+        // await refreshUser();
+        // await fetchUser();
 
         setSuccess("Sign-in successful! 🎉");
-        setTimeout(() => navigate("/"), 1500);
+        setTimeout(() => navigate("/"), 1000);
       } else {
         setError(response.data.message || "Sign-in failed.");
       }

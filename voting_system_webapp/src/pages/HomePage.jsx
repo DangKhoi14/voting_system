@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PollCard from "../components/PollCard";
 import Header from "../components/Header";
 import { FiSearch, FiPlus } from "react-icons/fi";
-// import { FiMoon, FiSun } from "react-icons/fi";
 import api from "../services/apiService";
-// import Icon from "../assets/logo.svg";
 
 
 const HomePage = () => {
@@ -16,6 +14,9 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+
+  localStorage.clear();
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -42,19 +43,7 @@ const HomePage = () => {
       }
     };
 
-    const fetchUser = async () => {
-      try {
-        const response = await api.get("/accounts/me");
-        if (response.data && response.data.statusCode === 200) {
-          setUser(response.data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-
     fetchPolls();
-    fetchUser();
   }, []);
 
   const filteredPolls = polls.filter((poll) => poll.title.toLowerCase().includes(searchTerm.toLowerCase()));
