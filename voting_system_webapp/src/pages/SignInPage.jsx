@@ -7,7 +7,6 @@ import { useTheme } from "../contexts/ThemeContext";
 import api from "../services/apiService";
 
 
-import { UserProvider } from "../contexts/UserContext";
 const SignInPage = ({ onSignUp }) => {
   const { darkMode } = useTheme();
   const [formData, setFormData] = useState({ usernameoremail: "", password: "" });
@@ -17,8 +16,6 @@ const SignInPage = ({ onSignUp }) => {
   const navigate = useNavigate();
 
   const { refreshUser } = useContext(UserContext);
-  const {fetchUser} = useContext(UserContext);
-  const { setUser, setChecked } = useContext(UserContext) || {}; 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,13 +46,12 @@ const SignInPage = ({ onSignUp }) => {
         localStorage.setItem("accessToken", response.data.data.accessToken);
         localStorage.setItem("refreshToken", response.data.data.refreshToken);
 
-        const me = await api.get("/Accounts/Me");
-        setUser(me.data.data); 
-        setChecked(true); 
-        localStorage.setItem("user", JSON.stringify(me.data.data));
-        console.log("User data:", me.data.data);
+        // const me = await api.get("/Accounts/Me");
+        // setUser(me.data.data); 
+        // setChecked(true);
+        // localStorage.setItem("user", JSON.stringify(me.data.data));
 
-        // await refreshUser();
+        await refreshUser();
         // await fetchUser();
 
         setSuccess("Sign-in successful! 🎉");

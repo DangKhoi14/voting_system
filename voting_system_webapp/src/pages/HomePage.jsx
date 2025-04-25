@@ -12,7 +12,6 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
 
